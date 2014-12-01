@@ -1,4 +1,9 @@
-﻿@model List<FulaDjur.Models.FultDjur>
+﻿
+
+<link href="~/Content/jRating.jquery.css" rel="stylesheet" media="screen" type="text/css" />
+
+
+@model List<FulaDjur.Models.FultDjur>
 
 @{
     ViewBag.Title = "Index";
@@ -12,7 +17,8 @@
                 <div class="plate center-block">
                     <h1 class="text-center">@Html.DisplayFor(x => x[i].Rubrik)</h1>
                     <div class="bg-image bg-image-holder" style="background-image:url(@Url.Content(Model[i].ImageUrl));"></div>
-                    <div>@Html.DisplayFor(x => x[i].UglyRating)</div>
+                    <input type="text" class="ratingEvent rating9" value="5" />
+                    <input type="text" class="rating rating5 " value="3" /><p>Grad av fulhet</p>/br
                     @foreach (var comment in Model[i].UglyComments)
                     {
                         <div class="panel panel-info">
@@ -90,5 +96,17 @@
         </div>
     </div>
 }*@
+@section scripts
+{
+    <!-- jQuery files -->
+    <script src="~/Scripts/jquery-1.10.2.js"></script>
+    <script src="~/Scripts/JRating.js"></script>
+    <script type="text/javascript">
+       
+        jQuery(document).ready(function() {
+            $('.rating').rating();
 
-    
+            $('.ratingEvent').rating({ rateEnd: function(v) { $('#result').text(v); } });
+        });
+    </script>
+}   
