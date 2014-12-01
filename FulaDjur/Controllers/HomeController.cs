@@ -13,12 +13,55 @@ namespace FulaDjur.Controllers
         {
             var fuladjur = new List<FultDjur>()
             {
-                new FultDjur { Rubrik = "Fulafisken", ImageUrl = "https://24tanzania.com/wp-content/uploads/2013/09/adeaBlobfish.jpg", UglyRating = 5 },
-                new FultDjur { Rubrik = "Könshår", ImageUrl = "http://www.oddee.com/_media/imgs/articles2/a97635_munchkin.jpg", UglyRating = 2 },
-                new FultDjur { Rubrik = "Uppklädd", ImageUrl = "http://littlefun.org/uploads/524b6b7be691b20cf6c4428c_736.jpg", UglyRating = 4 }
+                new FultDjur
+                {
+                    Id = 1,
+                    Rubrik = "Fulafisken",
+                    ImageUrl = "https://24tanzania.com/wp-content/uploads/2013/09/adeaBlobfish.jpg",
+                    UglyRating = 5,
+                    UglyComments = new List<UglyComment>()
+                    {
+                        new UglyComment { Name = "Bjön", Text = "Va ful!!!"},
+                        new UglyComment { Name = "Pontus", Text = "OMG!"}
+                    }
+                },
+                new FultDjur
+                {
+                    Id = 2,
+                    Rubrik = "Bee happy!",
+                    ImageUrl = "http://cdn1.smosh.com/sites/default/files/legacy.images/smosh-pit/122010/ugly-cat-9.jpg",
+                    UglyRating = 2,
+                    UglyComments = new List<UglyComment>()
+                    {
+                        new UglyComment { Name = "Vbrun", Text = "å fyfan"},
+                    }
+                },
+                new FultDjur {
+                    Id = 3,
+                    Rubrik = "Uppklädd",
+                    ImageUrl = "http://littlefun.org/uploads/524b6b7be691b20cf6c4428c_736.jpg",
+                    UglyRating = 4,
+                    UglyComments = new List<UglyComment>()
+                    {
+                        new UglyComment { Name = "Jim", Text = "Ser ut som Björn"},
+                    }
+                }
             };
 
             return View(fuladjur);
+        }
+
+        [HttpPost]
+        public ActionResult Index(int Id, ICollection<FultDjur> fuladjur)
+        {
+            var newComment = fuladjur.FirstOrDefault(djur => djur.Id == Id).NewComment;
+
+            return View();
+        }
+
+        public ActionResult UploadAnimal()
+        {
+            return View();
         }
 
         public ActionResult About()

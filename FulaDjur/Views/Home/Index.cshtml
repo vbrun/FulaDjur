@@ -1,31 +1,94 @@
-﻿@model IEnumerable<FulaDjur.Models.FultDjur>
+﻿@model List<FulaDjur.Models.FultDjur>
 
 @{
     ViewBag.Title = "Index";
 }
 
-<h2>Index</h2>
-
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-
-
-@foreach (var item in Model)
+@for (var i = 0; i < Model.Count(); i++)
 {
     <div class="row">
         <div class="col-12">
             <div class="row">
-                @Html.DisplayFor(modelItem => item.Rubrik)
-            </div>
-            <div class="row">
-                <img src="@Url.Content(item.ImageUrl)" alt="IMAGES" />
-            </div>
-            <div class="row">
-                @Html.DisplayFor(modelItem => item.UglyRating)
+                <div class="plate center-block">
+                    <h1 class="text-center">@Html.DisplayFor(x => x[i].Rubrik)</h1>
+                    <div class="bg-image bg-image-holder" style="background-image:url(@Url.Content(Model[i].ImageUrl));"></div>
+                    <div>@Html.DisplayFor(x => x[i].UglyRating)</div>
+                    @foreach (var comment in Model[i].UglyComments)
+                    {
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                @comment.Name
+                                <span class="glyphicon glyphicon-comment pull-right" aria-hidden="true"></span>
+                            </div>
+                            <div class="panel-body">
+                                @comment.Text
+                            </div>
+                        </div>
+                    }
+                    <div class="panel panel-info">
+                        <div class="panel-heading text-center">
+                            <h4>Kommentera</h4>
+                        </div>
+                        <div class="panel-body">
+                            @using (Html.BeginForm("Index", "Home", new { Id = Model[i].Id }, FormMethod.Post, new { @class = "form"}))
+                            {
+                                @Html.HiddenFor(x => x[i].Id)
+                                <div class="form-group">
+                                    <label for="inputName">Namn</label>
+                                    @Html.TextBoxFor(x => x[i].NewComment.Name, new { @class = "form-control", @Id = "inputName" })
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputText">Kommentar</label>
+                                    @Html.TextAreaFor(x => x[i].NewComment.Text, new { @class = "form-control", @Id = "inputText" })
+                                </div>
+                                <input type="submit" value="Skicka" class="btn btn-primary center-block"/>
+                            }
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 }
+@*@foreach (var djur in Model)
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="row">
+                <div class="plate center-block">
+                    <h1>@Html.DisplayFor(modelItem => djur.Rubrik)</h1>
+                    <div class="bg-image bg-image-holder" style="background-image:url(@Url.Content(djur.ImageUrl));"></div>
+                    <div>@Html.DisplayFor(modelItem => djur.UglyRating)</div>
+                    @foreach (var comment in djur.UglyComments)
+                    {
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                @comment.Name
+                                <span class="glyphicon glyphicon-comment pull-right" aria-hidden="true"></span>
+                            </div>
+                            <div class="panel-body">
+                                @comment.Text
+                            </div>
+                        </div>
+                    }
+                        <div class="panel panel-info">
+                            <div class="panel-heading text-center">
+                                <h4>Kommentera</h4>
+                            </div>
+                            <div class="panel-body">
+                                @using (Html.BeginForm("Index", "Home", new { Id = djur.Id}, FormMethod.Post, null))
+                                {
+                                    @Html.HiddenFor(model => djur.Id)
+                                    @Html.EditorFor(model => djur.NewComment.Name)
+                                    @Html.EditorFor(model => djur.NewComment.Text)
+                                    <input type="submit" value="Skicka" />
+                                }
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}*@
 
     
