@@ -13,7 +13,7 @@ namespace FulaDjur.Models
         public string ImageUrl { get; set; }
         public int UglyRating { get; set; }
 
-        public List<UglyComment> UglyComments { get; set; }
-        public UglyComment NewComment { get; set; }
+        public List<UglyCommentModel> UglyComments { get; set; }
+        public UglyCommentModel NewComment { get; set; }
     }
 }

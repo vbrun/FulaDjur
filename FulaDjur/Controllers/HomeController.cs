@@ -4,11 +4,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.WindowsAzure;
+using Microsoft.ServiceBus;
+using Microsoft.ServiceBus.Messaging; 
 
 namespace FulaDjur.Controllers
 {
     public class HomeController : Controller
     {
+        string qConnectionString = CloudConfigurationManager.GetSetting("animalqueu");
+        string qName = "animalqueu";
+
         public ActionResult Index()
         {
             var fuladjur = new List<FultDjur>()
@@ -19,10 +25,10 @@ namespace FulaDjur.Controllers
                     Rubrik = "Fulafisken",
                     ImageUrl = "https://24tanzania.com/wp-content/uploads/2013/09/adeaBlobfish.jpg",
                     UglyRating = 5,
-                    UglyComments = new List<UglyComment>()
+                    UglyComments = new List<UglyCommentModel>()
                     {
-                        new UglyComment { Name = "Bjön", Text = "Va ful!!!"},
-                        new UglyComment { Name = "Pontus", Text = "OMG!"}
+                        new UglyCommentModel { Name = "Bjön", Text = "Va ful!!!"},
+                        new UglyCommentModel { Name = "Pontus", Text = "OMG!"}
                     }
                 },
                 new FultDjur
@@ -31,9 +37,9 @@ namespace FulaDjur.Controllers
                     Rubrik = "Bee happy!",
                     ImageUrl = "http://cdn1.smosh.com/sites/default/files/legacy.images/smosh-pit/122010/ugly-cat-9.jpg",
                     UglyRating = 2,
-                    UglyComments = new List<UglyComment>()
+                    UglyComments = new List<UglyCommentModel>()
                     {
-                        new UglyComment { Name = "Vbrun", Text = "å fyfan"},
+                        new UglyCommentModel { Name = "Vbrun", Text = "å fyfan"},
                     }
                 },
                 new FultDjur {
@@ -41,9 +47,9 @@ namespace FulaDjur.Controllers
                     Rubrik = "Uppklädd",
                     ImageUrl = "http://littlefun.org/uploads/524b6b7be691b20cf6c4428c_736.jpg",
                     UglyRating = 4,
-                    UglyComments = new List<UglyComment>()
+                    UglyComments = new List<UglyCommentModel>()
                     {
-                        new UglyComment { Name = "Jim", Text = "Ser ut som Björn"},
+                        new UglyCommentModel { Name = "Jim", Text = "Ser ut som Björn"},
                     }
                 }
             };
@@ -54,9 +60,30 @@ namespace FulaDjur.Controllers
         [HttpPost]
         public ActionResult Index(int Id, ICollection<FultDjur> fuladjur)
         {
-            var newComment = fuladjur.FirstOrDefault(djur => djur.Id == Id).NewComment;
+            var newCommentModel = fuladjur.FirstOrDefault(djur => djur.Id == Id).NewComment;
 
-            return View();
+            var nm = NamespaceManager.CreateFromConnectionString(qConnectionString);
+            QueueDescription qd = new QueueDescription(qName);
+            //Ställ in Max size på queue på  2GB 
+            qd.MaxSizeInMegabytes = 2048;
+            //Max Time To Live är 5 minuter   
+            qd.DefaultMessageTimeToLive = new TimeSpan(0, 5, 0);
+            if (!nm.QueueExists(qName))
+            {
+                nm.CreateQueue(qd);
+            } 
+
+            //Skicka till queue med hjälp av den connectionstring vi tidigare ställt in i configen 
+            QueueClient qc = QueueClient.CreateFromConnectionString(qConnectionString, qName); 
+ 
+            var bm = new BrokeredMessage();
+            bm.Properties["Name"] = newCommentModel.Name;
+            bm.Properties["Text"] = newCommentModel.Text;
+            bm.Properties["AnimalId"] = Id;
+
+            qc.Send(bm);
+
+            return RedirectToAction("Index");
         }
 
         public ActionResult UploadAnimal()
