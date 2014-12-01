@@ -1,0 +1,24 @@
+﻿@using System.Web.UI.WebControls
+@using Microsoft.Ajax.Utilities
+@{
+    ViewBag.Title = "ImageUpload";
+}
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<script src="~/Scripts/ImageUpload.js"></script>
+<h2>ImageUpload</h2>
+
+@using (Html.BeginForm("ImageUpload", "Upload",
+FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div>Please select an image to upload</div>
+
+    <input id="image" name="image" type="file" class="btn btn-primary left" style="margin: 1%">
+    <input id="rubrik" name="rubrik" type="text" placeholder="Rubrik" required class="form-control" style="margin: 1%" />
+    <input type="submit" value="Upload Image" class="btn btn-primary bottom-left" style="margin: 1%" />
+}
+
+<div class="text-info">
+   @ViewBag.UploadMessage
+    
+</div>
