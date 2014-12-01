@@ -22,4 +22,5 @@
       <Setting name="animalqueu" />
     </ConfigurationSettings>
   </WorkerRole>
+  <WorkerRole name="ImageWorker" vmsize="Small" />
 </ServiceDefinition>

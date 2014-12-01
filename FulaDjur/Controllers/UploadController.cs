@@ -4,23 +4,30 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.WindowsAzure;
+using Microsoft.ServiceBus;
+using Microsoft.ServiceBus.Messaging;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Auth;
+using Microsoft.WindowsAzure.Storage.Blob;
+
 
 namespace FulaDjur.Controllers
 {
     public class UploadController : Controller
     {
+        string qConnectionString = CloudConfigurationManager.GetSetting("animalqueu");
+        string qName = "animalqueu";
+        string fuladjurstorageConnectionString = CloudConfigurationManager.GetSetting("fuladjurstorage");
+       // CloudStorageAccount _storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("jimstoragetest"));
+
         // GET: Upload
         public ActionResult Index()
         {
-            return View();
-        }
-
-        [HttpGet]
-        public ActionResult ImageSelect()
-        {
             return View("ImageUpload");
+       
         }
-
+        
         [HttpPost]
         public ActionResult ImageUpload()
         {
@@ -38,43 +45,46 @@ namespace FulaDjur.Controllers
                 image.FileName, image.ContentType, image.ContentLength);
 
                 // TODO: actually save the image to Azure blob storage
-                //UploadAnimal(image);
+                UploadAnimal(image);
 
             }
 
             return View();
         }
 
-        //public ActionResult UploadAnimal(HttpPostedFileBase uploadedFile)
-        //{
-        //    CloudBlobClient blobClient = _storageAccount.CreateCloudBlobClient();
+        public ActionResult UploadAnimal(HttpPostedFileBase uploadedFile)
+        {
 
-        //    // Retrieve a reference to a container. 
-        //    CloudBlobContainer container = blobClient.GetContainerReference("mycontainer");
+            //här grejjas det
+            CloudStorageAccount _storageAccount = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
+            CloudBlobClient blobClient = _storageAccount.CreateCloudBlobClient();
 
-        //    // Create the container if it doesn't already exist.
-        //    container.CreateIfNotExists();
+            // Retrieve a reference to a container. 
+            CloudBlobContainer container = blobClient.GetContainerReference("mycontainer");
 
-        //    container.SetPermissions(new BlobContainerPermissions { PublicAccess = BlobContainerPublicAccessType.Blob });
+            // Create the container if it doesn't already exist.
+            container.CreateIfNotExists();
 
-        //    // Retrieve reference to a blob named "myblob".
-        //    //CloudBlockBlob blockBlob = container.GetBlockBlobReference("myblob");
+            container.SetPermissions(new BlobContainerPermissions { PublicAccess = BlobContainerPublicAccessType.Blob });
 
-        //    string uniqueBlobName = string.Format("productimages/image_{0}{1}",
-        //                        Guid.NewGuid().ToString(), Path.GetExtension(uploadedFile.FileName));
+            // Retrieve reference to a blob named "myblob".
+            //CloudBlockBlob blockBlob = container.GetBlockBlobReference("myblob");
 
-        //    CloudBlockBlob blob = container.GetBlockBlobReference(uniqueBlobName);
+            string uniqueBlobName = string.Format("productimages/image_{0}{1}",
+                                Guid.NewGuid().ToString(), Path.GetExtension(uploadedFile.FileName));
 
-        //    blob.Properties.ContentType = uploadedFile.ContentType;
-        //    blob.UploadFromStream(uploadedFile.InputStream);
+            CloudBlockBlob blob = container.GetBlockBlobReference(uniqueBlobName);
 
-        //    // Create or overwrite the "myblob" blob with contents from a local file.
-        //    //using (var fileStream = System.IO.File.OpenRead(@"D:\testbilder\20130805_204109.jpg"))
-        //    //{
-        //    //    blockBlob.UploadFromStream(fileStream);
-        //    //} 
+            blob.Properties.ContentType = uploadedFile.ContentType;
+            blob.UploadFromStream(uploadedFile.InputStream);
 
-        //    return View("Index");
-        //}
+            // Create or overwrite the "myblob" blob with contents from a local file.
+            //using (var fileStream = System.IO.File.OpenRead(@"D:\testbilder\20130805_204109.jpg"))
+            //{
+            //    blockBlob.UploadFromStream(fileStream);
+            //} 
+
+            return View("Index");
+        }
     }
 }
