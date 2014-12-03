@@ -4,84 +4,69 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using Microsoft.WindowsAzure;
-using Microsoft.ServiceBus;
-using Microsoft.ServiceBus.Messaging; 
+using FulaDjur.Data;
+using FulaDjur.Data.Implementations;
+using FulaDjur.Models.ViewModels;
+
 
 namespace FulaDjur.Controllers
 {
     public class HomeController : Controller
     {
-        string qConnectionString = CloudConfigurationManager.GetSetting("animalqueu");
-        string qName = "animalqueu";
+        IAnimalRepository _animals;
+        IUglyCommentRepository _uglyComments;
+
+        public HomeController()
+        {
+            _animals = new FakeAnimalRepository();
+            _uglyComments = new UglyCommentRepository();
+        }
 
         public ActionResult Index()
         {
-            var fuladjur = new List<FultDjur>()
-            {
-                new FultDjur
-                {
-                    Id = 1,
-                    Rubrik = "Fulafisken",
-                    ImageUrl = "https://24tanzania.com/wp-content/uploads/2013/09/adeaBlobfish.jpg",
-                    UglyRating = 5,
-                    UglyComments = new List<UglyCommentModel>()
-                    {
-                        new UglyCommentModel { Name = "Bjön", Text = "Va ful!!!"},
-                        new UglyCommentModel { Name = "Pontus", Text = "OMG!"}
-                    }
-                },
-                new FultDjur
-                {
-                    Id = 2,
-                    Rubrik = "Bee happy!",
-                    ImageUrl = "http://cdn1.smosh.com/sites/default/files/legacy.images/smosh-pit/122010/ugly-cat-9.jpg",
-                    UglyRating = 2,
-                    UglyComments = new List<UglyCommentModel>()
-                    {
-                        new UglyCommentModel { Name = "Vbrun", Text = "å fyfan"},
-                    }
-                },
-                new FultDjur {
-                    Id = 3,
-                    Rubrik = "Uppklädd",
-                    ImageUrl = "http://littlefun.org/uploads/524b6b7be691b20cf6c4428c_736.jpg",
-                    UglyRating = 4,
-                    UglyComments = new List<UglyCommentModel>()
-                    {
-                        new UglyCommentModel { Name = "Jim", Text = "Ser ut som Björn"},
-                    }
-                }
-            };
+            var model = new MainListViewModel();
 
-            return View(fuladjur);
+            var animals = _animals.GetAll();
+
+            foreach(var animal in animals)
+            {
+                var animalID = animal.Id;
+
+                animal.UglyComments = _uglyComments.GetAll(animalID);
+                animal.NewComment = new UglyCommentModel { AnimalId = animalID };
+            }
+
+            model.Animals = animals;
+
+            return View(model);
         }
 
         [HttpPost]
-        public ActionResult Index(int Id, ICollection<FultDjur> fuladjur)
+        public ActionResult Index(int Id, MainListViewModel model)
         {
-            var newCommentModel = fuladjur.FirstOrDefault(djur => djur.Id == Id).NewComment;
+            //var newCommentModel = model.Animals.FirstOrDefault(djur => djur.Id == Id).NewComment;
 
-            var nm = NamespaceManager.CreateFromConnectionString(qConnectionString);
-            QueueDescription qd = new QueueDescription(qName);
-            //Ställ in Max size på queue på  2GB 
-            qd.MaxSizeInMegabytes = 2048;
-            //Max Time To Live är 5 minuter   
-            qd.DefaultMessageTimeToLive = new TimeSpan(0, 5, 0);
-            if (!nm.QueueExists(qName))
+            //_uglyComments.Create(newCommentModel);
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public ActionResult CreateComment(UglyAnimalModel form)
+        {
+
+            int animalId = int.Parse(Request.Form["djur.NewComment.AnimalId"]);
+            string name = Request.Form["djur.NewComment.Name"];
+            string text = Request.Form["djur.NewComment.Text"];
+
+            UglyCommentModel newComment = new UglyCommentModel
             {
-                nm.CreateQueue(qd);
-            } 
+                AnimalId = animalId,
+                Name = name,
+                Text = text
+            };
 
-            //Skicka till queue med hjälp av den connectionstring vi tidigare ställt in i configen 
-            QueueClient qc = QueueClient.CreateFromConnectionString(qConnectionString, qName); 
- 
-            var bm = new BrokeredMessage();
-            bm.Properties["Name"] = newCommentModel.Name;
-            bm.Properties["Text"] = newCommentModel.Text;
-            bm.Properties["AnimalId"] = Id;
-
-            qc.Send(bm);
+            _uglyComments.Create(newComment);
 
             return RedirectToAction("Index");
         }

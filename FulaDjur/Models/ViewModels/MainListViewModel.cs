@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace FulaDjur.Models.ViewModels
 {
-    public class UglyCommentModel
+    public class MainListViewModel
     {
-        public string Name { get; set; }
-        public string Text { get; set; }
-        public int AnimalId { get; set; }
+        public List<UglyAnimalModel> Animals { get; set; }
+        public int TotalNumberOfAnimals { get; set; }
     }
 }

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FulaDjur.Models
+namespace FulaDjur.Models.ViewModels
 {
-    public class FultDjur
+    public class UglyAnimalModel
     {
         public int Id { get; set; }
         public string Rubrik { get; set; }
