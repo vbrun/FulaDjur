@@ -8,66 +8,13 @@
     ViewBag.Title = "Index";
 }
 
-@*@for (var i = 0; i < Model.Animals.Count(); i++)
-{
-    <div class="row">
-        <div class="col-12">
-            <div class="row">
-                <div class="plate center-block">
-                    <h1 class="text-center">@Html.DisplayFor(x => x.Animals[i].Rubrik)</h1>
-                    <div class="bg-image bg-image-holder" style="background-image:url(@Url.Content(Model.Animals[i].ImageUrl));"></div>
-                    <input type="text" class="ratingEvent rating9" value="5" />
-                    <input type="text" class="rating rating5 " value="3" /><p>Grad av fulhet</p>/br
-                    @foreach (var comment in Model.Animals[i].UglyComments)
-                    {
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                @comment.Name
-                                <span class="glyphicon glyphicon-comment pull-right" aria-hidden="true"></span>
-                            </div>
-                            <div class="panel-body">
-                                @comment.Text
-                            </div>
-                        </div>
-                    }
-                    <div class="panel panel-info">
-                        <div class="panel-heading text-center">
-                            <h4>Kommentera</h4>
-                        </div>
-                        <div class="panel-body">
-                            @using (Ajax.BeginForm("CreateComment", "Home", null))
-                            {
-                                @Html.EditorFor(x => x.Animals[i].NewComment)
-                                <input type="submit" value="OK" />
-                            }
-
-                            @using (Html.BeginForm("CreateComment", "Home", FormMethod.Post, new { @class = "form"}))
-                            {
-                                @Html.EditorFor(x => x.Animals[i].NewComment)
-                                @tml.HiddenFor(x => x.Animals[i].Id)
-                                <div class="form-group">
-                                    <label for="inputName">Namn</label>
-                                    @Html.TextBoxFor(x => x.Animals[i].NewComment.Name, new { @class = "form-control", @Id = "inputName" })
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputText">Kommentar</label>
-                                    @Html.TextAreaFor(x => x.Animals[i].NewComment.Text, new { @class = "form-control", @Id = "inputText" })
-                                </div>
-                                <input type="submit" value="Skicka" class="btn btn-primary center-block"/>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-}*@
 @foreach (var djur in Model.Animals)
     {
         <div class="row">
             <div class="col-12">
                 <div class="row">
                     <div class="plate center-block">
+                        @Html.HiddenFor(model => djur.Id)
                         <h1>@Html.DisplayFor(modelItem => djur.Rubrik)</h1>
                         <div class="bg-image bg-image-holder" style="background-image:url(@Url.Content(djur.ImageUrl));"></div>
                         <div>@Html.DisplayFor(modelItem => djur.UglyRating)</div>
@@ -88,13 +35,18 @@
                                     <h4>Kommentera</h4>
                                 </div>
                                 <div class="panel-body">
-                                    @using (Html.BeginForm("CreateComment", "Home", FormMethod.Post, null))
+                                    @using (Html.BeginForm("CreateComment", "Home", FormMethod.Post, new { @class = "form" }))
                                     {
                                         @Html.HiddenFor(model => djur.NewComment.AnimalId)
-                                        @Html.EditorFor(model => djur.NewComment.Name)
-                                        @Html.EditorFor(model => djur.NewComment.Text)
-
-                                        <input type="submit" value="Skicka" />
+                                        <div class="form-group">
+                                            <label for="inputName">Namn</label>
+                                            @Html.TextBoxFor(model => djur.NewComment.Name, new { @class = "form-control", @Id = "inputName" })
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="inputText">Kommentar</label>
+                                            @Html.TextAreaFor(model => djur.NewComment.Text, new { @class = "form-control", @Id = "inputText" })
+                                        </div>
+                                        <input type="submit" value="Skicka" class="btn btn-primary center-block" />
                                     }
                                 </div>
                             </div>
