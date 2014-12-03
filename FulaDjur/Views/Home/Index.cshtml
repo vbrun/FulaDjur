@@ -106,7 +106,8 @@
         jQuery(document).ready(function() {
             $('.rating').rating();
 
-            $('.ratingEvent').rating({ rateEnd: function(v) { $('#result').text(v); } });
+            $('.ratingEvent').rating({ rateEnd: function (v) { $('#result').text(v); } });
+            console.log($('#result').title);
         });
     </script>
 }   

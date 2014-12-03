@@ -1,6 +1,7 @@
 ﻿
-
+ 
 (function ($) {
+    var antalKlick;
     $.fn.rating = function(options) {
         var settings = $.extend(
         {
@@ -9,12 +10,16 @@
 
         function setRating(e, ul) {
             var i = parseInt(e.val());
-            if (!i) {
-                i = 0;
+            var medel = (i * antalKlick) / antalKlick;
+            console.log(antalKlick);
+            console.log(i);
+            console.log(medel);
+            if (!medel) {
+                medel = 0;
             }
 
             ul.find('a').removeAttr('class');
-            ul.find('a:lt(' + i + ')').attr('class', 'full');
+            ul.find('a:lt(' + medel + ')').attr('class', 'full');
         }
 
         this.each(function() {
@@ -49,12 +54,13 @@
                         setRating(e, ul);
                     });
 
-                    link.click(function() {
+                    link.click(function () {
+                        antalKlick++;
                         e.val(index + 1);
-
+                        console.log(e.val());
                         setRating(e, ul);
 
-                        settings.rateEnd(index + 1);
+                        settings.rateEnd(index +1);
                     });
                 });
             }
