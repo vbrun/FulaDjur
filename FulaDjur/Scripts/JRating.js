@@ -1,5 +1,16 @@
 ﻿
-
+PostRating = function (v, bildid) {
+    $.ajax({
+        type: "POST",
+        url: "/Rating/AddRatingNumbers",
+        data: { number: v, bildId: bildid },
+        success: function () {
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("nu blev det fel");
+        }
+    });
+};
 (function ($) {
    
     $.fn.rating = function(options) {
@@ -53,11 +64,12 @@
                     });
 
                     link.click(function () {
-                       
+                      var bildid = $(this).parent().parent().parent().find('#djur_Id').val();
                         e.val(index + 1);
                         var v = parseInt(e.val());
-                        PostRating(v);
-                        console.log(v);
+                        PostRating(v, bildid);
+                        console.log(this);
+                        console.log(bildid);
                         setRating(e, ul);
 
                         settings.rateEnd(index +1);
@@ -74,15 +86,3 @@
     };
 
 })(jQuery);
-PostRating = function (i) {
-    $.ajax({
-        type: "POST",
-        url: "/Rating/AddRatingNumbers",
-        data: { number: i },
-        success: function () {
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-            alert("nu blev det fel");
-        }
-    });
-};

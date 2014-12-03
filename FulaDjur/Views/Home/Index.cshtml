@@ -14,11 +14,11 @@
             <div class="col-12">
                 <div class="row">
                     <div class="plate center-block">
-                        @Html.HiddenFor(model => djur.Id)
+                        
                         <h1>@Html.DisplayFor(modelItem => djur.Rubrik)</h1>
                         <div class="bg-image bg-image-holder" style="background-image:url(@Url.Content(djur.ImageUrl));"></div>
                         <div>@Html.DisplayFor(modelItem => djur.UglyRating)</div>
-                        
+                        @Html.HiddenFor(model => djur.Id)
                         <input type="text" class="rating rating5 " value="3" /><p>Grad av fulhet</p>
                         @foreach (var comment in djur.UglyComments)
                         {
