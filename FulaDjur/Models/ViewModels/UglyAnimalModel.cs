@@ -11,7 +11,9 @@ namespace FulaDjur.Models.ViewModels
         public int Id { get; set; }
         public string Rubrik { get; set; }
         public string ImageUrl { get; set; }
-        public int UglyRating { get; set; }
+        public float UglyRating { get; set; }
+        public int NumberClicks { get; set; }
+
 
         public List<UglyCommentModel> UglyComments { get; set; }
         public UglyCommentModel NewComment { get; set; }

@@ -1,7 +1,7 @@
 ﻿
- 
+
 (function ($) {
-    var antalKlick;
+   
     $.fn.rating = function(options) {
         var settings = $.extend(
         {
@@ -10,16 +10,14 @@
 
         function setRating(e, ul) {
             var i = parseInt(e.val());
-            var medel = (i * antalKlick) / antalKlick;
-            console.log(antalKlick);
-            console.log(i);
-            console.log(medel);
-            if (!medel) {
-                medel = 0;
+            
+          
+            if (!i) {
+                i = 0;
             }
 
             ul.find('a').removeAttr('class');
-            ul.find('a:lt(' + medel + ')').attr('class', 'full');
+            ul.find('a:lt(' + i + ')').attr('class', 'full');
         }
 
         this.each(function() {
@@ -55,9 +53,11 @@
                     });
 
                     link.click(function () {
-                        antalKlick++;
+                       
                         e.val(index + 1);
-                        console.log(e.val());
+                        var v = parseInt(e.val());
+                        PostRating(v);
+                        console.log(v);
                         setRating(e, ul);
 
                         settings.rateEnd(index +1);
@@ -74,3 +74,15 @@
     };
 
 })(jQuery);
+PostRating = function (i) {
+    $.ajax({
+        type: "POST",
+        url: "/Rating/AddRatingNumbers",
+        data: { number: i },
+        success: function () {
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("nu blev det fel");
+        }
+    });
+};
