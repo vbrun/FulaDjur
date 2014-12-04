@@ -16,7 +16,7 @@ namespace FulaDjur.Controllers
         IAnimalRepository _animals;
         // GET: Rating
         [HttpPost]
-        public void AddRatingNumbers(int number, int bildId)
+        public void AddRatingNumbers(int number, string bildId)
         {
             var IdBild = bildId;
             _animals = new UglyAnimalRepository();
@@ -28,7 +28,7 @@ namespace FulaDjur.Controllers
 
         }
 
-        public void updateRating(int bildId, int counter, int rating)
+        public void updateRating(string bildId, int counter, int rating)
         {
             var animals = _animals.GetAll();
 

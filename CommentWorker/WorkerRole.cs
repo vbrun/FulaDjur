@@ -18,10 +18,10 @@ namespace CommentWorker
 {
     public class WorkerRole : RoleEntryPoint
     {
-        string qConnectionString = CloudConfigurationManager.GetSetting("animalqueu");
+        string qConnectionString = "Endpoint=sb://animalqueu-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=NpRLmVlZ5Gw3ChHCWBmBUYY06ZJNOTBpy2pYwoxxEso=";
         string qName = "commentqueu";
 
-        string fuladjurstorageConnectionString = CloudConfigurationManager.GetSetting("fuladjurstorage");
+        private string fuladjurstorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=fuladjurstorage;AccountKey=0qz/KnA6q9Pcnz8FYKFzpLuW9Qde5VwUDimZUDZ5wrpYBIgPkyDBPaAgv5SwYKQCOHDNVq/LYUsiQagi1KIFxA==";
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private readonly ManualResetEvent runCompleteEvent = new ManualResetEvent(false);

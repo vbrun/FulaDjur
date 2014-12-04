@@ -18,10 +18,11 @@ namespace FulaDjur.Data.Implementations
 {
     public class UglyAnimalRepository : IAnimalRepository
     {
-        string qConnectionString = CloudConfigurationManager.GetSetting("animalqueu");
+        private string qConnectionString =
+            "Endpoint=sb://animalqueu-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=NpRLmVlZ5Gw3ChHCWBmBUYY06ZJNOTBpy2pYwoxxEso=";
         string qName = "animalqueu";
 
-        string fuladjurstorageConnectionString = CloudConfigurationManager.GetSetting("fuladjurstorage"); 
+        private string fuladjurstorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=fuladjurstorage;AccountKey=0qz/KnA6q9Pcnz8FYKFzpLuW9Qde5VwUDimZUDZ5wrpYBIgPkyDBPaAgv5SwYKQCOHDNVq/LYUsiQagi1KIFxA=="; 
 
         public List<UglyAnimalModel> GetAll()
         {
@@ -62,6 +63,12 @@ namespace FulaDjur.Data.Implementations
             return uglyAnimals;
         }
 
+        public int GetRating()
+        {
+            var Result= 0;
+            return Result;
+        }
+
 
         public void Create(string topic, HttpPostedFileBase file)
         {
@@ -80,7 +87,33 @@ namespace FulaDjur.Data.Implementations
             QueueClient qc = QueueClient.CreateFromConnectionString(qConnectionString, qName);
 
             var bm = new BrokeredMessage();
+            bm.Properties["Action"] = "Create";
             bm.Properties["Topic"] = topic;
+
+            // In me bild här
+            //bm.Properties["Image"] =
+
+            qc.Send(bm);
+        }
+        public void UpdateRating(string Rating, HttpPostedFileBase file)
+        {
+            var nm = NamespaceManager.CreateFromConnectionString(qConnectionString);
+            QueueDescription qd = new QueueDescription(qName);
+            //Ställ in Max size på queue på  2GB 
+            qd.MaxSizeInMegabytes = 2048;
+            //Max Time To Live är 5 minuter   
+            qd.DefaultMessageTimeToLive = new TimeSpan(0, 5, 0);
+            if (!nm.QueueExists(qName))
+            {
+                nm.CreateQueue(qd);
+            }
+
+            //Skicka till queue med hjälp av den connectionstring vi tidigare ställt in i configen 
+            QueueClient qc = QueueClient.CreateFromConnectionString(qConnectionString, qName);
+
+            var bm = new BrokeredMessage();
+            bm.Properties["Action"] = "UpdateRating";
+            bm.Properties["Rating"] = Rating;
 
             // In me bild här
             //bm.Properties["Image"] =

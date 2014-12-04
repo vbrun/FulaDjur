@@ -18,10 +18,10 @@ namespace AnimalWorker
 {
     public class WorkerRole : RoleEntryPoint
     {
-        string qConnectionString = CloudConfigurationManager.GetSetting("animalqueu");
+        string qConnectionString = "Endpoint=sb://animalqueu-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=NpRLmVlZ5Gw3ChHCWBmBUYY06ZJNOTBpy2pYwoxxEso=";
         string qName = "animalqueu";
 
-        string fuladjurstorageConnectionString = CloudConfigurationManager.GetSetting("fuladjurstorage"); 
+        private string fuladjurstorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=fuladjurstorage;AccountKey=0qz/KnA6q9Pcnz8FYKFzpLuW9Qde5VwUDimZUDZ5wrpYBIgPkyDBPaAgv5SwYKQCOHDNVq/LYUsiQagi1KIFxA==";
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private readonly ManualResetEvent runCompleteEvent = new ManualResetEvent(false);
@@ -85,19 +85,23 @@ namespace AnimalWorker
                         Trace.WriteLine("Animal Received");
                         msg.Complete();
 
-                        var topic = (string)msg.Properties["Topic"];
-                        //var image = (string)msg.Properties["Image"];
+                        var action = (string)msg.Properties["Action"];
+                        if (action == "Create")
+                        {
+                            var topic = (string)msg.Properties["Topic"];
+                            //var image = (string)msg.Properties["Image"];
 
-                        SaveAnimalToStorage(topic); 
+                            SaveAnimalToStorage(topic); 
 
-                        //Trace.WriteLine("Comment Received");
-                        //msg.Complete();
+                        }
+                        else if(action=="UpdateRating")
+                        {
+                            var rating = (string)msg.Properties["Rating"];
 
-                        //var name = (string)msg.Properties["Name"];
-                        //var text = (string)msg.Properties["Text"];
-                        //var animalid = (int)msg.Properties["AnimalId"];
+                            SaveAnimalToStorage(rating);
+                        }
+ 
 
-                        //SaveCommentToStorage(name, text, animalid);
                     }
                     catch (Exception)
                     {
