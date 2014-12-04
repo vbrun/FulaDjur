@@ -9,66 +9,74 @@
 }
 
 @foreach (var djur in Model.Animals)
-    {
-        <div class="row">
-            <div class="col-12">
-                <div class="row">
-                    <div class="plate center-block">
-                        
-                        <h1>@Html.DisplayFor(modelItem => djur.Rubrik)</h1>
-                        <div class="bg-image bg-image-holder" style="background-image:url(@Url.Content(djur.ImageUrl));"></div>
-                        <div>@Html.DisplayFor(modelItem => djur.UglyRating)</div>
-                        @Html.HiddenFor(model => djur.Id)
-                        <input type="text" class="rating rating5 " value="3" /><p>Grad av fulhet</p>
-                        @foreach (var comment in djur.UglyComments)
-                        {
-                            <div class="panel panel-info">
-                                <div class="panel-heading">
-                                    @comment.Name
-                                    <span class="glyphicon glyphicon-comment pull-right" aria-hidden="true"></span>
-                                </div>
-                                <div class="panel-body">
-                                    @comment.Text
-                                </div>
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="row">
+                <div class="plate center-block">
+
+                    <h1>@Html.DisplayFor(modelItem => djur.Rubrik)</h1>
+                    <div class="bg-image bg-image-holder" style="background-image:url(@Url.Content(djur.ImageUrl));"></div>
+                    <div>@Html.DisplayFor(modelItem => djur.UglyRating)</div>
+                    @Html.HiddenFor(model => djur.Id)
+                    <input type="text" class="rating rating5 " value="3" /><p>Grad av fulhet</p>
+                    @foreach (var comment in djur.UglyComments)
+                    {
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                @comment.Name
+                                <span class="glyphicon glyphicon-comment pull-right" aria-hidden="true"></span>
                             </div>
-                        }
-                            <div class="panel panel-info">
-                                <div class="panel-heading text-center">
-                                    <h4>Kommentera</h4>
-                                </div>
-                                <div class="panel-body">
-                                    @using (Html.BeginForm("CreateComment", "Home", FormMethod.Post, new { @class = "form" }))
-                                    {
-                                        @Html.HiddenFor(model => djur.NewComment.AnimalId)
-                                        <div class="form-group">
-                                            <label for="inputName">Namn</label>
-                                            @Html.TextBoxFor(model => djur.NewComment.Name, new { @class = "form-control", @Id = "inputName" })
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="inputText">Kommentar</label>
-                                            @Html.TextAreaFor(model => djur.NewComment.Text, new { @class = "form-control", @Id = "inputText" })
-                                        </div>
-                                        <input type="submit" value="Skicka" class="btn btn-primary center-block" />
-                                    }
-                                </div>
+                            <div class="panel-body">
+                                @comment.Text
                             </div>
+                        </div>
+                    }
+                    <div class="panel panel-info">
+                        <div class="panel-heading text-center">
+                            <h4>Kommentera</h4>
+                        </div>
+                        <div class="panel-body">
+                            @using (Html.BeginForm("CreateComment", "Home", FormMethod.Post, new { @class = "form" }))
+                            {
+                                @Html.HiddenFor(model => djur.NewComment.AnimalId)
+                                <div class="form-group">
+                                    <label for="inputName">Namn</label>
+                                    @Html.TextBoxFor(model => djur.NewComment.Name, new { @class = "form-control", @Id = "inputName" })
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputText">Kommentar</label>
+                                    @Html.TextAreaFor(model => djur.NewComment.Text, new { @class = "form-control", @Id = "inputText" })
+                                </div>
+                                <input type="submit" value="Skicka" class="btn btn-primary center-block" />
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    }
-
+    </div>
+}
+@using (Html.BeginForm("Index", "Home", new { @counter = (Model.PageCounter + 1) }, FormMethod.Post))
+{
+    <input type="submit" value="Ladda 3 nya fulingar" class="btn btn-primary center-block" />
+}
+<br />
+@using (Html.BeginForm("Index", "Home", new { @counter = (Model.PageCounter - 1) }, FormMethod.Post))
+{
+    <input type="submit" value="Backa 3 fulingar" class="btn btn-primary center-block" />
+}
 @section scripts
 {
     <!-- jQuery files -->
     <script src="~/Scripts/jquery-1.10.2.js"></script>
     <script src="~/Scripts/JRating.js"></script>
     <script type="text/javascript">
-       
-        jQuery(document).ready(function() {
+
+        jQuery(document).ready(function () {
             $('.rating').rating();
 
             $('.ratingEvent').rating({ rateEnd: function (v) { $('#result').text(v); } });
         });
     </script>
-}   
+}

@@ -10,5 +10,6 @@ namespace FulaDjur.Models.ViewModels
     {
         public List<UglyAnimalModel> Animals { get; set; }
         public int TotalNumberOfAnimals { get; set; }
+        public int PageCounter { get; set; }
     }
 }
