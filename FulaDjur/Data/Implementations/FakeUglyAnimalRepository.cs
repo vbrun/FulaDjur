@@ -44,5 +44,17 @@ namespace FulaDjur.Data.Implementations
         {
             throw new NotImplementedException();
         }
+
+
+        public float GetRating(string BildId)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public void UpdateRating(string bildId, int counter, int rating)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

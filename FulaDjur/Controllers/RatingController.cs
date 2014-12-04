@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using AnimalWorker.Models;
 using FulaDjur.Data;
 using FulaDjur.Data.Implementations;
 using FulaDjur.Models.ViewModels;
@@ -14,6 +15,7 @@ namespace FulaDjur.Controllers
     public class RatingController : Controller
     {
         IAnimalRepository _animals;
+
         // GET: Rating
         [HttpPost]
         public void AddRatingNumbers(int number, string bildId)
@@ -24,24 +26,26 @@ namespace FulaDjur.Controllers
             int i = counter++;
             var sum = + number;
 
-            updateRating(IdBild, i, sum);
+           _animals.UpdateRating(IdBild,i,sum); 
+          // var LoadRating = _animals.GetRating(bildId);
+            
 
         }
+        
+        //public void updateRating(string bildId, int counter, int rating)
+        //{
+        //    var animals = _animals.GetAll();
 
-        public void updateRating(string bildId, int counter, int rating)
-        {
-            var animals = _animals.GetAll();
-
-            foreach (var animal in animals)
-            {
-                animal.Id = bildId;
-                animal.UglyRating = rating;
-                animal.NumberClicks = counter;
+        //    foreach (var animal in animals)
+        //    {
+        //        animal.Id = bildId;
+        //        animal.UglyRating = rating;
+        //        animal.NumberClicks = counter;
                 
 
-            }
+        //    }
            
-        }
+        //}
        
     }
 }

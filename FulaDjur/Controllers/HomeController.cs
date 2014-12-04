@@ -22,7 +22,7 @@ namespace FulaDjur.Controllers
             _uglyComments = new UglyCommentRepository();
         }
 
-        public ActionResult Index()
+        public ActionResult Index(int? counter)
         {
             var model = new MainListViewModel();
 
@@ -36,7 +36,17 @@ namespace FulaDjur.Controllers
                 animal.NewComment = new UglyCommentModel { AnimalId = animalID };
             }
 
-            model.Animals = animals;
+            if (counter.HasValue && counter != 0 && counter != 1)
+            {
+                model.PageCounter = counter.Value;
+
+                model.Animals = animals.Skip(3 * (counter.Value - 1)).Take(3).ToList();
+
+                return View(model);
+            }
+
+            model.PageCounter = 1;
+            model.Animals = animals.Take(3).ToList();
 
             return View(model);
         }

@@ -71,10 +71,34 @@ namespace FulaDjur.Data.Implementations
             return uglyAnimals;
         }
 
-        public int GetRating()
+        public float GetRating(string BildId)
         {
-            var Result= 0;
-            return Result;
+            // Retrieve the storage account from the connection string.
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
+
+            // Create the table client.
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+
+            // Create the CloudTable object that represents the "people" table.
+            CloudTable table = tableClient.GetTableReference("UglyAnimals");
+
+            // Create a retrieve operation that takes a customer entity.
+            TableOperation retrieveOperation = TableOperation.Retrieve<UglyAnimal>("BildId","UglyRating");
+
+            // Execute the retrieve operation.
+            TableResult retrievedResult = table.Execute(retrieveOperation);
+
+            // Print the phone number of the result.
+            if (retrievedResult.Result != null)
+            {
+                Console.WriteLine(((UglyAnimalModel) retrievedResult.Result).UglyRating);
+                var Result = ((UglyAnimalModel) retrievedResult.Result).UglyRating;
+                return Result;
+            }
+            else
+                Console.WriteLine("Rating culd not be recivd");
+            return 0;
+
         }
 
         public void Create(string topic, HttpPostedFileBase file)
@@ -105,30 +129,59 @@ namespace FulaDjur.Data.Implementations
             qc.Send(bm);
         }
 
-        public void UpdateRating(string Rating, HttpPostedFileBase file)
+        public void UpdateRating(string BildId, int counter, int rating)
         {
-            var nm = NamespaceManager.CreateFromConnectionString(qConnectionString);
-            QueueDescription qd = new QueueDescription(qName);
-            //Ställ in Max size på queue på  2GB 
-            qd.MaxSizeInMegabytes = 2048;
-            //Max Time To Live är 5 minuter   
-            qd.DefaultMessageTimeToLive = new TimeSpan(0, 5, 0);
-            if (!nm.QueueExists(qName))
-            {
-                nm.CreateQueue(qd);
-            }
+             // Retrieve storage account from connection string.
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
+
+            // Create the table client.
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+
+            // Create the CloudTable object that represents the "UglyAnimals" table.
+            CloudTable table = tableClient.GetTableReference("UglyAnimals");
+
+            // Construct the query operation for all animals entities where PartitionKey="UglyAnimal".
+            TableQuery<UglyAnimal> query = new TableQuery<UglyAnimal>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "UglyAnimal"));
 
             //Skicka till queue med hjälp av den connectionstring vi tidigare ställt in i configen 
             QueueClient qc = QueueClient.CreateFromConnectionString(qConnectionString, qName);
 
-            var bm = new BrokeredMessage();
-            bm.Properties["Action"] = "UpdateRating";
-            bm.Properties["Rating"] = Rating;
+            // Create a retrieve operation that takes a customer entity.
+            TableOperation retrieveOperation = TableOperation.Retrieve<UglyAnimal>("UglyAnimal", BildId);
 
-            // In me bild här
-            //bm.Properties["Image"] =
+            // Execute the operation.
+            TableResult retrievedResult = table.Execute(retrieveOperation);
 
-            qc.Send(bm);
+            // Assign the result to a CustomerEntity object.
+            UglyAnimal updateEntity = (UglyAnimal)retrievedResult.Result;
+            if (updateEntity != null)
+            {
+                // Change the phone number.
+                updateEntity.NumberClicks += 1;
+                updateEntity.TotalPoints += rating;
+
+                // Create the InsertOrReplace TableOperation
+                TableOperation insertOrReplaceOperation = TableOperation.InsertOrReplace(updateEntity);
+
+                // Execute the operation.
+                table.Execute(insertOrReplaceOperation);
+
+                Console.WriteLine("Entity was updated.");
+            }
+
+            else
+                Console.WriteLine("Entity could not be retrieved.");
+           
+            
+
+            //var bm = new BrokeredMessage();
+            //bm.Properties["Action"] = "UpdateRating";
+            //bm.Properties["Rating"] = rating;
+
+            //// In me bild här
+            ////bm.Properties["Image"] =
+
+            //qc.Send(bm);
         }
     }
 }
