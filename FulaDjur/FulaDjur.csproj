@@ -193,6 +193,8 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ManageAnimalsController.cs" />
+    <Compile Include="Controllers\ManageCommentsController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\RatingController.cs" />
     <Compile Include="Controllers\UploadController.cs" />
@@ -289,6 +291,8 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Upload\Index.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\UglyCommentModel.cshtml" />
+    <Content Include="Views\ManageAnimals\Index.cshtml" />
+    <Content Include="Views\ManageComments\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

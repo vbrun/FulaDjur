@@ -31,11 +31,20 @@ namespace FulaDjur.Data.Implementations
             // Create the CloudTable object that represents the "UglyAnimals" table.
             CloudTable table = tableClient.GetTableReference("UglyComments");
 
-            TableQuery<UglyComment> query = new TableQuery<UglyComment>().Where(
+            TableQuery<UglyComment> query = new TableQuery<UglyComment>();
+
+            if(animalId != null)
+            {
+                query.Where(
                 TableQuery.CombineFilters(
                     TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "UglyComment"),
                     TableOperators.And,
                     TableQuery.GenerateFilterCondition("AnimalId", QueryComparisons.Equal, animalId)));
+            }
+            else
+            {
+                query.Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "UglyComment"));
+            }
 
             List<UglyCommentModel> uglyComments = new List<UglyCommentModel>();
 

@@ -28,7 +28,7 @@ select {
 
 
 .bg-image {
-    height: 350px;
+  height: 350px;
   width: 100%;
 
   /* lt ie8 */
@@ -56,3 +56,20 @@ select {
   .plate { width:500px;}
 }
 
+.bg-image-thumbnail {
+  height: 50px;
+  width: 50px;
+
+  /* lt ie8 */
+  -ms-background-position-x: center;
+  -ms-background-position-y: bottom;
+  background-position: center bottom;
+
+  /* scale bg image proportionately */
+  background-size: cover;
+    
+  /* ie8 workaround - http://louisremi.github.io/background-size-polyfill/ */
+  -ms-behavior: url(/backgroundsize.min.htc);
+  /* prevent scaling past src width (or not) */
+  /* max-width: 1200px; */
+}

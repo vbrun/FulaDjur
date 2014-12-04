@@ -1,0 +1,49 @@
+﻿@model IEnumerable<FulaDjur.Models.ViewModels.UglyAnimalModel>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Rubrik)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ImageUrl)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.UglyRating)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.NumberClicks)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Rubrik)
+        </td>
+        <td>
+            <div class="bg-image-thumbnail" style="background-image:url(@Url.Content(item.ImageUrl));"></div>
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.UglyRating)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.NumberClicks)
+        </td>
+        <td>
+            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+        </td>
+    </tr>
+}
+
+</table>
