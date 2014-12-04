@@ -8,6 +8,7 @@ using System.Web.Mvc;
 
 namespace FulaDjur.Controllers
 {
+    [Authorize]
     public class ManageAnimalsController : Controller
     {
 
@@ -24,6 +25,13 @@ namespace FulaDjur.Controllers
             var animals = _animals.GetAll();
 
             return View(animals);
+        }
+
+        public ActionResult Delete(string ImageUri)
+        {
+            _animals.Delete(ImageUri);
+
+            return RedirectToAction("Index");
         }
     }
 }

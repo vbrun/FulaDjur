@@ -114,6 +114,21 @@ namespace FulaDjur.Data.Implementations
 
             CloudBlockBlob blob = container.GetBlockBlobReference(filename);
 
+            // Create the table client.
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+
+            // Create the CloudTable object that represents the "people" table.
+            CloudTable table = tableClient.GetTableReference("UglyAnimals");
+
+            // Create a retrieve operation that takes a customer entity.
+            //TableOperation retrieveOperation = TableOperation.Retrieve<UglyAnimal>("BildId", "UglyRating");
+
+            TableQuery<UglyAnimal> query = new TableQuery<UglyAnimal>().Where(TableQuery.GenerateFilterCondition("ImageId", QueryComparisons.Equal, blob.Name));
+
+            var animal = table.ExecuteQuery(query).FirstOrDefault();
+
+            table.Execute(TableOperation.Delete(animal));
+
             blob.Delete();
 
         }

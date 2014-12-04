@@ -56,5 +56,11 @@ namespace FulaDjur.Data.Implementations
         {
             throw new NotImplementedException();
         }
+
+
+        public void Delete(string imgUri)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

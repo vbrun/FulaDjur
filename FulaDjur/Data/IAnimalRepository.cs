@@ -14,5 +14,6 @@ namespace FulaDjur.Data
         float GetRating(string BildId);
         void Create(string topic, HttpPostedFileBase image);
         void UpdateRating(string bildId, int counter, int rating);
+        void Delete(string imgUri);
     }
 }

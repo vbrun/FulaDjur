@@ -1,4 +1,5 @@
-﻿using FulaDjur.Models.ViewModels;
+﻿using System.Drawing;
+using FulaDjur.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,6 @@ namespace FulaDjur.Data
     {
         List<UglyCommentModel> GetAll(string id);
         void Create(UglyCommentModel comment);
+        void Delete(String ImageUri);
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.WindowsAzure;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
 using AnimalWorker.Models;
 
@@ -33,7 +34,7 @@ namespace FulaDjur.Data.Implementations
 
             TableQuery<UglyComment> query = new TableQuery<UglyComment>();
 
-            if(animalId != null)
+            if (animalId != null)
             {
                 query.Where(
                 TableQuery.CombineFilters(
@@ -51,7 +52,7 @@ namespace FulaDjur.Data.Implementations
             // Print the fields for each animal.
             foreach (UglyComment entity in table.ExecuteQuery(query))
             {
-   
+
                 var comment = new UglyCommentModel
                 {
                     Id = entity.RowKey,
@@ -89,6 +90,36 @@ namespace FulaDjur.Data.Implementations
             bm.Properties["AnimalId"] = comment.AnimalId;
 
             qc.Send(bm);
+        }
+
+        public void Delete(string imgUri)
+        {
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
+
+            // Create the table client.
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+
+            // Create the CloudTable object that represents the "people" table.
+            CloudTable table = tableClient.GetTableReference("UglyComments");
+
+            // Create a retrieve operation that takes a customer entity.
+            TableOperation retrieveOperation = TableOperation.Retrieve<UglyComment>("UglyComment", imgUri);
+
+            // Execute the operation.
+            TableResult retrievedResult = table.Execute(retrieveOperation);
+
+            // Assign the result to a CustomerEntity.
+            UglyComment deleteEntity = (UglyComment)retrievedResult.Result;
+
+            // Create the Delete TableOperation.
+            if (deleteEntity != null)
+            {
+                TableOperation deleteOperation = TableOperation.Delete(deleteEntity);
+
+                // Execute the operation.
+                table.Execute(deleteOperation);
+
+            }
         }
     }
 }

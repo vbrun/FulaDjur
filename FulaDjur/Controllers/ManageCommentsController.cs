@@ -8,6 +8,7 @@ using System.Web.Mvc;
 
 namespace FulaDjur.Controllers
 {
+    [Authorize]
     public class ManageCommentsController : Controller
     {
 
@@ -24,6 +25,13 @@ namespace FulaDjur.Controllers
             var comments = _comments.GetAll(null);
 
             return View(comments);
+        }
+
+        public ActionResult Delete(string ImageUri)
+        {
+            _comments.Delete(ImageUri);
+
+            return RedirectToAction("Index");
         }
     }
 }

@@ -41,7 +41,7 @@
             @Html.DisplayFor(modelItem => item.NumberClicks)
         </td>
         <td>
-            @Html.ActionLink("Delete", "Delete", new { id=item.ImageUrl })
+            @Html.ActionLink("Delete", "Delete", new { ImageUri=item.ImageUrl })
         </td>
     </tr>
 }
