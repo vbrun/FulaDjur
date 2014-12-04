@@ -19,7 +19,7 @@ namespace FulaDjur
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-            //CreateBasicAccounts();
+            CreateBasicAccounts();
         }
 
         private void CreateBasicAccounts()
@@ -34,7 +34,8 @@ namespace FulaDjur
 
                 var admin = new ApplicationUser()
                 {
-                    UserName = "admin@fuladjur.se"
+                    UserName = "admin@fuladjur.se",
+                    Email = "admin@fuladjur.se"
                 };
 
                 if (um.FindByName(admin.UserName) == null)

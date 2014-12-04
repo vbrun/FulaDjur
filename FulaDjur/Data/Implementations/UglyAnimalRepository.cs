@@ -18,8 +18,7 @@ namespace FulaDjur.Data.Implementations
 {
     public class UglyAnimalRepository : IAnimalRepository
     {
-        private string qConnectionString =
-            "Endpoint=sb://animalqueu-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=NpRLmVlZ5Gw3ChHCWBmBUYY06ZJNOTBpy2pYwoxxEso=";
+        private string qConnectionString = "Endpoint=sb://animalqueu-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=NpRLmVlZ5Gw3ChHCWBmBUYY06ZJNOTBpy2pYwoxxEso=";
         string qName = "animalqueu";
 
         private string fuladjurstorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=fuladjurstorage;AccountKey=0qz/KnA6q9Pcnz8FYKFzpLuW9Qde5VwUDimZUDZ5wrpYBIgPkyDBPaAgv5SwYKQCOHDNVq/LYUsiQagi1KIFxA=="; 
@@ -38,6 +37,12 @@ namespace FulaDjur.Data.Implementations
             // Construct the query operation for all animals entities where PartitionKey="UglyAnimal".
             TableQuery<UglyAnimal> query = new TableQuery<UglyAnimal>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "UglyAnimal"));
 
+            // Create the blob client.
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+
+            // Retrieve reference to a previously created container.
+            CloudBlobContainer container = blobClient.GetContainerReference("mycontainer");
+
             List<UglyAnimalModel> uglyAnimals = new List<UglyAnimalModel>();
 
             // Print the fields for each animal.
@@ -48,11 +53,14 @@ namespace FulaDjur.Data.Implementations
                 if (entity.NumberClicks > 0)
                     uglyRating = (int)(entity.TotalPoints / entity.NumberClicks);
 
+                // Retrieve reference to a blob named "myblob".
+                CloudBlockBlob blockBlob = container.GetBlockBlobReference(entity.ImageId);
+
                 var animal = new UglyAnimalModel
                 {
                     Id = entity.RowKey,
                     Rubrik = entity.Topic,
-                    ImageUrl = "http://littlefun.org/uploads/524b6b7be691b20cf6c4428c_736.jpg",
+                    ImageUrl = blockBlob.Uri.ToString(),
                     NumberClicks = entity.NumberClicks,
                     UglyRating = uglyRating
                 };
@@ -69,9 +77,9 @@ namespace FulaDjur.Data.Implementations
             return Result;
         }
 
-
         public void Create(string topic, HttpPostedFileBase file)
         {
+
             var nm = NamespaceManager.CreateFromConnectionString(qConnectionString);
             QueueDescription qd = new QueueDescription(qName);
             //Ställ in Max size på queue på  2GB 
@@ -86,15 +94,17 @@ namespace FulaDjur.Data.Implementations
             //Skicka till queue med hjälp av den connectionstring vi tidigare ställt in i configen 
             QueueClient qc = QueueClient.CreateFromConnectionString(qConnectionString, qName);
 
-            var bm = new BrokeredMessage();
+            var bm = new BrokeredMessage(file.InputStream, true);
+            
             bm.Properties["Action"] = "Create";
             bm.Properties["Topic"] = topic;
 
-            // In me bild här
-            //bm.Properties["Image"] =
+            bm.ContentType = file.ContentType;
+
 
             qc.Send(bm);
         }
+
         public void UpdateRating(string Rating, HttpPostedFileBase file)
         {
             var nm = NamespaceManager.CreateFromConnectionString(qConnectionString);

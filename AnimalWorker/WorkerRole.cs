@@ -13,6 +13,8 @@ using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.WindowsAzure.Storage.Table;
 using AnimalWorker.Models;
+using System.IO;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace AnimalWorker
 {
@@ -83,24 +85,30 @@ namespace AnimalWorker
                     try
                     {
                         Trace.WriteLine("Animal Received");
-                        msg.Complete();
 
                         var action = (string)msg.Properties["Action"];
                         if (action == "Create")
                         {
-                            var topic = (string)msg.Properties["Topic"];
-                            //var image = (string)msg.Properties["Image"];
+                            Stream stream = msg.GetBody<Stream>();
 
-                            SaveAnimalToStorage(topic); 
+                            var imageId = Guid.NewGuid().ToString();
+                            var contentType = msg.ContentType;
+
+                            SaveStreamToStorage(stream, imageId, contentType);
+
+                            var topic = (string)msg.Properties["Topic"];
+
+                            SaveAnimalToStorage(topic, imageId, contentType); 
 
                         }
                         else if(action=="UpdateRating")
                         {
                             var rating = (string)msg.Properties["Rating"];
 
-                            SaveAnimalToStorage(rating);
+                            //SaveAnimalToStorage(rating);
                         }
- 
+
+                        msg.Complete();
 
                     }
                     catch (Exception)
@@ -114,7 +122,37 @@ namespace AnimalWorker
             }
         }
 
-        private void SaveAnimalToStorage(string topic)
+        private void SaveStreamToStorage(Stream stream, string imageId, string contentType)
+        {
+
+            CloudStorageAccount _storageAccount = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
+            CloudBlobClient blobClient = _storageAccount.CreateCloudBlobClient();
+
+            // Retrieve a reference to a container. 
+            CloudBlobContainer container = blobClient.GetContainerReference("mycontainer");
+
+            // Create the container if it doesn't already exist.
+            container.CreateIfNotExists();
+
+            container.SetPermissions(new BlobContainerPermissions { PublicAccess = BlobContainerPublicAccessType.Blob });
+
+            var fullName = imageId + GetEndingForType(contentType);
+
+            CloudBlockBlob blob = container.GetBlockBlobReference(fullName);
+
+            blob.Properties.ContentType = contentType;
+            blob.UploadFromStream(stream);
+        }
+
+        private string GetEndingForType(string contentType)
+        {
+            if (contentType == "image/jpeg")
+                return ".jpg";
+
+            return ".bulle";
+        }
+
+        private void SaveAnimalToStorage(string topic, string imageId, string contentType)
         {
             //det namn vår table ska ha 
             string tableName = "UglyAnimals";
@@ -128,10 +166,12 @@ namespace AnimalWorker
 
             var key = Guid.NewGuid().ToString();
 
+            var fullName = imageId + GetEndingForType(contentType);
+
             var uglyAnimal = new UglyAnimal(key)
             {
                 Topic = topic,
-                ImageId = "bulle",
+                ImageId = fullName,
                 TotalPoints = 0,
                 NumberClicks = 0
             };
