@@ -13,10 +13,10 @@ namespace FulaDjur.Data.Implementations
         {
             var allUglyComments = new List<UglyCommentModel>()
             {
-                new UglyCommentModel { AnimalId = "1", Name = "Bjön", Text = "Va ful!!!"},
-                new UglyCommentModel { AnimalId = "1", Name = "Pontus", Text = "OMG!"},
-                new UglyCommentModel { AnimalId = "2", Name = "Vbrun", Text = "å fyfan"},
-                new UglyCommentModel { AnimalId = "3", Name = "Jim", Text = "Ser ut som Björn"}
+                new UglyCommentModel { AnimalId = "1", Name = "Bjön", Text = "Va ful!!!", Created = DateTime.Now.AddHours(-5)},
+                new UglyCommentModel { AnimalId = "1", Name = "Pontus", Text = "OMG!", Created = DateTime.Now.AddHours(-3)},
+                new UglyCommentModel { AnimalId = "2", Name = "Vbrun", Text = "å fyfan", Created = DateTime.Now.AddHours(-2)},
+                new UglyCommentModel { AnimalId = "3", Name = "Jim", Text = "Ser ut som Björn", Created = DateTime.Now.AddHours(-1)}
             };
 
             var uglyComments = allUglyComments.Where(comment => comment.AnimalId == id).ToList();

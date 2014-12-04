@@ -12,5 +12,6 @@ namespace FulaDjur.Models.ViewModels
         public string Name { get; set; }
         public string Text { get; set; }
         public string AnimalId { get; set; }
+        public DateTime Created { get; set; }
     }
 }

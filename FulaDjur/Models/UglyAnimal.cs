@@ -21,6 +21,7 @@ namespace AnimalWorker.Models
         public string ImageId { get; set; }
         public int TotalPoints { get; set; }
         public int NumberClicks { get; set; }
+        public DateTime Created { get; set; }
 
     }
 }

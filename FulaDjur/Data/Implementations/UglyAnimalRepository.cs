@@ -62,13 +62,16 @@ namespace FulaDjur.Data.Implementations
                     Rubrik = entity.Topic,
                     ImageUrl = blockBlob.Uri.ToString(),
                     NumberClicks = entity.NumberClicks,
-                    UglyRating = uglyRating
+                    UglyRating = uglyRating,
+                    Created = entity.Created
                 };
 
                 uglyAnimals.Add(animal);
             }
 
-            return uglyAnimals;
+            var orderedAnimals = uglyAnimals.OrderByDescending(animal => animal.Created).ToList();
+
+            return orderedAnimals;
         }
 
         public float GetRating(string BildId)
@@ -103,39 +106,59 @@ namespace FulaDjur.Data.Implementations
 
         public void Delete(string imgUri)
         {
-            Uri uri = new Uri(imgUri);
-            string filename = System.IO.Path.GetFileName(uri.LocalPath);
 
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
+            CreateQueueIfRequired();
 
-            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+            QueueClient qc = QueueClient.CreateFromConnectionString(qConnectionString, qName);
 
-            CloudBlobContainer container = blobClient.GetContainerReference("mycontainer");
+            var bm = new BrokeredMessage();
 
-            CloudBlockBlob blob = container.GetBlockBlobReference(filename);
+            bm.Label = "Delete";
 
-            // Create the table client.
-            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+            bm.Properties["ImageUri"] = imgUri;
 
-            // Create the CloudTable object that represents the "people" table.
-            CloudTable table = tableClient.GetTableReference("UglyAnimals");
-
-            // Create a retrieve operation that takes a customer entity.
-            //TableOperation retrieveOperation = TableOperation.Retrieve<UglyAnimal>("BildId", "UglyRating");
-
-            TableQuery<UglyAnimal> query = new TableQuery<UglyAnimal>().Where(TableQuery.GenerateFilterCondition("ImageId", QueryComparisons.Equal, blob.Name));
-
-            var animal = table.ExecuteQuery(query).FirstOrDefault();
-
-            table.Execute(TableOperation.Delete(animal));
-
-            blob.Delete();
+            qc.Send(bm);
 
         }
 
         public void Create(string topic, HttpPostedFileBase file)
         {
 
+            CreateQueueIfRequired();
+
+            QueueClient qc = QueueClient.CreateFromConnectionString(qConnectionString, qName);
+
+            var bm = new BrokeredMessage(file.InputStream, true);
+
+            bm.Label = "Create";
+
+            bm.Properties["Topic"] = topic;
+
+            bm.ContentType = file.ContentType;
+
+            qc.Send(bm);
+        }
+
+        public void UpdateRating(string bildId, int counter, int rating)
+        {
+
+            CreateQueueIfRequired();
+
+            QueueClient qc = QueueClient.CreateFromConnectionString(qConnectionString, qName);
+
+            var bm = new BrokeredMessage();
+
+            bm.Label = "UpdateRating";
+
+            bm.Properties["BildId"] = bildId;
+            bm.Properties["Counter"] = counter;
+            bm.Properties["Rating"] = rating;
+
+            qc.Send(bm);
+        }
+
+        private void CreateQueueIfRequired()
+        {
             var nm = NamespaceManager.CreateFromConnectionString(qConnectionString);
             QueueDescription qd = new QueueDescription(qName);
             //Ställ in Max size på queue på  2GB 
@@ -146,74 +169,6 @@ namespace FulaDjur.Data.Implementations
             {
                 nm.CreateQueue(qd);
             }
-
-            //Skicka till queue med hjälp av den connectionstring vi tidigare ställt in i configen 
-            QueueClient qc = QueueClient.CreateFromConnectionString(qConnectionString, qName);
-
-            var bm = new BrokeredMessage(file.InputStream, true);
-
-            bm.Properties["Action"] = "Create";
-            bm.Properties["Topic"] = topic;
-
-            bm.ContentType = file.ContentType;
-
-
-            qc.Send(bm);
-        }
-
-        public void UpdateRating(string BildId, int counter, int rating)
-        {
-            // Retrieve storage account from connection string.
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
-
-            // Create the table client.
-            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
-
-            // Create the CloudTable object that represents the "UglyAnimals" table.
-            CloudTable table = tableClient.GetTableReference("UglyAnimals");
-
-            // Construct the query operation for all animals entities where PartitionKey="UglyAnimal".
-            TableQuery<UglyAnimal> query = new TableQuery<UglyAnimal>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "UglyAnimal"));
-
-            //Skicka till queue med hjälp av den connectionstring vi tidigare ställt in i configen 
-            QueueClient qc = QueueClient.CreateFromConnectionString(qConnectionString, qName);
-
-            // Create a retrieve operation that takes a customer entity.
-            TableOperation retrieveOperation = TableOperation.Retrieve<UglyAnimal>("UglyAnimal", BildId);
-
-            // Execute the operation.
-            TableResult retrievedResult = table.Execute(retrieveOperation);
-
-            // Assign the result to a CustomerEntity object.
-            UglyAnimal updateEntity = (UglyAnimal)retrievedResult.Result;
-            if (updateEntity != null)
-            {
-                // Change the phone number.
-                updateEntity.NumberClicks += 1;
-                updateEntity.TotalPoints += rating;
-
-                // Create the InsertOrReplace TableOperation
-                TableOperation insertOrReplaceOperation = TableOperation.InsertOrReplace(updateEntity);
-
-                // Execute the operation.
-                table.Execute(insertOrReplaceOperation);
-
-                Console.WriteLine("Entity was updated.");
-            }
-
-            else
-                Console.WriteLine("Entity could not be retrieved.");
-
-
-
-            //var bm = new BrokeredMessage();
-            //bm.Properties["Action"] = "UpdateRating";
-            //bm.Properties["Rating"] = rating;
-
-            //// In me bild här
-            ////bm.Properties["Image"] =
-
-            //qc.Send(bm);
         }
     }
 }

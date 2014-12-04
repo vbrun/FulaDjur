@@ -31,7 +31,11 @@ namespace FulaDjur.Controllers
         {
             _comments.Delete(ImageUri);
 
-            return RedirectToAction("Index");
+            ViewBag.Message = "Kommentaren kommer att tas bort...";
+
+            var comments = _comments.GetAll(null);
+
+            return View("Index", comments);
         }
     }
 }

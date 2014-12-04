@@ -83,13 +83,16 @@ namespace CommentWorker
                     try
                     {
                         Trace.WriteLine("Comment Received");
+
+                        if(msg.Label == "Delete")
+                        {
+                            var imageUri = (string)msg.Properties["ImageUri"];
+
+                            Delete(imageUri);
+                        }
+                        
                         msg.Complete();
 
-                        var name = (string)msg.Properties["Name"];
-                        var text = (string)msg.Properties["Text"];
-                        var animalid = (string)msg.Properties["AnimalId"];
-
-                        SaveCommentToStorage(name, text, animalid);
                     }
                     catch (Exception)
                     {
@@ -102,31 +105,34 @@ namespace CommentWorker
             }
         }
 
-        private void SaveCommentToStorage(string name, string text, string animalid)
+        private void Delete(string imgUri)
         {
-            //det namn vår table ska ha 
-            string tableName = "UglyComments";
-            //Connection till table storage account 
-            CloudStorageAccount account = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
-            //Klient för table storage 
-            CloudTableClient tableStorage = account.CreateCloudTableClient();
-            //Hämta en reference till tablen, om inte finns, skapa table 
-            CloudTable table = tableStorage.GetTableReference(tableName);
-            table.CreateIfNotExists();
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
 
-            var key = Guid.NewGuid().ToString();
+            // Create the table client.
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
 
-            var comment = new UglyComment(key)
+            // Create the CloudTable object that represents the "people" table.
+            CloudTable table = tableClient.GetTableReference("UglyComments");
+
+            // Create a retrieve operation that takes a customer entity.
+            TableOperation retrieveOperation = TableOperation.Retrieve<UglyComment>("UglyComment", imgUri);
+
+            // Execute the operation.
+            TableResult retrievedResult = table.Execute(retrieveOperation);
+
+            // Assign the result to a CustomerEntity.
+            UglyComment deleteEntity = (UglyComment)retrievedResult.Result;
+
+            // Create the Delete TableOperation.
+            if (deleteEntity != null)
             {
-                Name = name,
-                Text = text,
-                AnimalId = animalid
-            };
+                TableOperation deleteOperation = TableOperation.Delete(deleteEntity);
 
-            //Sparar personen i signups table 
-            TableOperation insertOperation = TableOperation.Insert(comment);
-            table.Execute(insertOperation);
+                // Execute the operation.
+                table.Execute(deleteOperation);
 
-        } 
+            }
+        }
     }
 }

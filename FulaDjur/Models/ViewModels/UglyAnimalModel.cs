@@ -13,7 +13,7 @@ namespace FulaDjur.Models.ViewModels
         public string ImageUrl { get; set; }
         public float UglyRating { get; set; }
         public int NumberClicks { get; set; }
-
+        public DateTime Created { get; set; }
 
         public List<UglyCommentModel> UglyComments { get; set; }
         public UglyCommentModel NewComment { get; set; }

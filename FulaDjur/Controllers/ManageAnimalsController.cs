@@ -30,8 +30,12 @@ namespace FulaDjur.Controllers
         public ActionResult Delete(string ImageUri)
         {
             _animals.Delete(ImageUri);
+            
+            ViewBag.Message = "Filen '" + ImageUri + "' kommer att tas bort...";
 
-            return RedirectToAction("Index");
+            var animals = _animals.GetAll();
+
+            return View("Index", animals);
         }
     }
 }

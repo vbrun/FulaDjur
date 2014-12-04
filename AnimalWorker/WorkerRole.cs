@@ -86,8 +86,8 @@ namespace AnimalWorker
                     {
                         Trace.WriteLine("Animal Received");
 
-                        var action = (string)msg.Properties["Action"];
-                        if (action == "Create")
+                        //var action = (string)msg.Properties["Action"];
+                        if (msg.Label == "Create")
                         {
                             Stream stream = msg.GetBody<Stream>();
 
@@ -101,11 +101,18 @@ namespace AnimalWorker
                             SaveAnimalToStorage(topic, imageId, contentType); 
 
                         }
-                        else if(action=="UpdateRating")
+                        else if(msg.Label == "UpdateRating")
                         {
-                            var rating = (string)msg.Properties["Rating"];
+                            var bildId = (string)msg.Properties["BildId"];
+                            var rating = (int)msg.Properties["Rating"];
 
-                            //SaveAnimalToStorage(rating);
+                            UpdateRating(bildId, rating);
+                        }
+                        else if (msg.Label == "Delete")
+                        {
+                            var imageUri = (string)msg.Properties["ImageUri"];
+
+                            Delete(imageUri);
                         }
 
                         msg.Complete();
@@ -173,7 +180,8 @@ namespace AnimalWorker
                 Topic = topic,
                 ImageId = fullName,
                 TotalPoints = 0,
-                NumberClicks = 0
+                NumberClicks = 0,
+                Created = DateTime.Now
             };
 
             //Sparar personen i signups table 
@@ -181,32 +189,81 @@ namespace AnimalWorker
             table.Execute(insertOperation);
         }
 
+        private void UpdateRating(string BildId, int rating)
+        {
+            // Retrieve storage account from connection string.
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
 
-        //private void SaveCommentToStorage(string name, string text, int animalid)
-        //{
-        //    //det namn vår table ska ha 
-        //    string tableName = "UglyComments";
-        //    //Connection till table storage account 
-        //    CloudStorageAccount account = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
-        //    //Klient för table storage 
-        //    CloudTableClient tableStorage = account.CreateCloudTableClient();
-        //    //Hämta en reference till tablen, om inte finns, skapa table 
-        //    CloudTable table = tableStorage.GetTableReference(tableName);
-        //    table.CreateIfNotExists();
+            // Create the table client.
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
 
-        //    var key = Guid.NewGuid().ToString();
+            // Create the CloudTable object that represents the "UglyAnimals" table.
+            CloudTable table = tableClient.GetTableReference("UglyAnimals");
 
-        //    var comment = new UglyComment(key)
-        //    {
-        //        Name = name,
-        //        Text = text,
-        //        AnimalId = animalid
-        //    };
+            // Construct the query operation for all animals entities where PartitionKey="UglyAnimal".
+            TableQuery<UglyAnimal> query = new TableQuery<UglyAnimal>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "UglyAnimal"));
 
-        //    //Sparar personen i signups table 
-        //    TableOperation insertOperation = TableOperation.Insert(comment);
-        //    table.Execute(insertOperation);
+            //Skicka till queue med hjälp av den connectionstring vi tidigare ställt in i configen 
+            QueueClient qc = QueueClient.CreateFromConnectionString(qConnectionString, qName);
 
-        //} 
+            // Create a retrieve operation that takes a customer entity.
+            TableOperation retrieveOperation = TableOperation.Retrieve<UglyAnimal>("UglyAnimal", BildId);
+
+            // Execute the operation.
+            TableResult retrievedResult = table.Execute(retrieveOperation);
+
+            // Assign the result to a CustomerEntity object.
+            UglyAnimal updateEntity = (UglyAnimal)retrievedResult.Result;
+            if (updateEntity != null)
+            {
+                // Change the phone number.
+                updateEntity.NumberClicks += 1;
+                updateEntity.TotalPoints += rating;
+
+                // Create the InsertOrReplace TableOperation
+                TableOperation insertOrReplaceOperation = TableOperation.InsertOrReplace(updateEntity);
+
+                // Execute the operation.
+                table.Execute(insertOrReplaceOperation);
+
+                Console.WriteLine("Entity was updated.");
+            }
+
+            else
+                Console.WriteLine("Entity could not be retrieved.");
+
+        }
+
+        private void Delete(string imgUri)
+        {
+            Uri uri = new Uri(imgUri);
+            string filename = System.IO.Path.GetFileName(uri.LocalPath);
+
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
+
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+
+            CloudBlobContainer container = blobClient.GetContainerReference("mycontainer");
+
+            CloudBlockBlob blob = container.GetBlockBlobReference(filename);
+
+            // Create the table client.
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+
+            // Create the CloudTable object that represents the "people" table.
+            CloudTable table = tableClient.GetTableReference("UglyAnimals");
+
+            // Create a retrieve operation that takes a customer entity.
+            //TableOperation retrieveOperation = TableOperation.Retrieve<UglyAnimal>("BildId", "UglyRating");
+
+            TableQuery<UglyAnimal> query = new TableQuery<UglyAnimal>().Where(TableQuery.GenerateFilterCondition("ImageId", QueryComparisons.Equal, blob.Name));
+
+            var animal = table.ExecuteQuery(query).FirstOrDefault();
+
+            table.Execute(TableOperation.Delete(animal));
+
+            blob.Delete();
+
+        }
     }
 }

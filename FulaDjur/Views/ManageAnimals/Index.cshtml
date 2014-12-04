@@ -1,14 +1,14 @@
 ﻿@model IEnumerable<FulaDjur.Models.ViewModels.UglyAnimalModel>
 
-@{
-    ViewBag.Title = "Index";
+@if (@ViewBag.Message != null)
+{
+    <div class="well bg-info">
+        @ViewBag.Message
+    </div>
 }
 
-<h2>Index</h2>
+<h2>Fula Djur</h2>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
 <table class="table">
     <tr>
         <th>

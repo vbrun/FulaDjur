@@ -58,17 +58,63 @@ namespace FulaDjur.Data.Implementations
                     Id = entity.RowKey,
                     Name = entity.Name,
                     Text = entity.Text,
-                    AnimalId = entity.AnimalId
+                    AnimalId = entity.AnimalId,
+                    Created = entity.Created
                 };
 
                 uglyComments.Add(comment);
             }
 
-            return uglyComments;
+            var orderedComments = uglyComments.OrderBy(comment => comment.Created).ToList();
+
+            return orderedComments;
         }
 
-
         public void Create(UglyCommentModel comment)
+        {
+            //det namn vår table ska ha 
+            string tableName = "UglyComments";
+            //Connection till table storage account 
+            CloudStorageAccount account = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
+            //Klient för table storage 
+            CloudTableClient tableStorage = account.CreateCloudTableClient();
+            //Hämta en reference till tablen, om inte finns, skapa table 
+            CloudTable table = tableStorage.GetTableReference(tableName);
+            table.CreateIfNotExists();
+
+            var key = Guid.NewGuid().ToString();
+
+            var newComment = new UglyComment(key)
+            {
+                Name = comment.Name,
+                Text = comment.Text,
+                AnimalId = comment.AnimalId,
+                Created = DateTime.Now
+            };
+
+            //Sparar personen i signups table 
+            TableOperation insertOperation = TableOperation.Insert(newComment);
+            table.Execute(insertOperation);
+
+        } 
+
+        public void Delete(string imgUri)
+        {
+            CreateQueueIfRequired();
+
+            QueueClient qc = QueueClient.CreateFromConnectionString(qConnectionString, qName);
+
+            var bm = new BrokeredMessage();
+
+            bm.Label = "Delete";
+
+            bm.Properties["ImageUri"] = imgUri;
+
+            qc.Send(bm);
+
+        }
+
+        private void CreateQueueIfRequired()
         {
             var nm = NamespaceManager.CreateFromConnectionString(qConnectionString);
             QueueDescription qd = new QueueDescription(qName);
@@ -79,46 +125,6 @@ namespace FulaDjur.Data.Implementations
             if (!nm.QueueExists(qName))
             {
                 nm.CreateQueue(qd);
-            }
-
-            //Skicka till queue med hjälp av den connectionstring vi tidigare ställt in i configen 
-            QueueClient qc = QueueClient.CreateFromConnectionString(qConnectionString, qName);
-
-            var bm = new BrokeredMessage();
-            bm.Properties["Name"] = comment.Name;
-            bm.Properties["Text"] = comment.Text;
-            bm.Properties["AnimalId"] = comment.AnimalId;
-
-            qc.Send(bm);
-        }
-
-        public void Delete(string imgUri)
-        {
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
-
-            // Create the table client.
-            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
-
-            // Create the CloudTable object that represents the "people" table.
-            CloudTable table = tableClient.GetTableReference("UglyComments");
-
-            // Create a retrieve operation that takes a customer entity.
-            TableOperation retrieveOperation = TableOperation.Retrieve<UglyComment>("UglyComment", imgUri);
-
-            // Execute the operation.
-            TableResult retrievedResult = table.Execute(retrieveOperation);
-
-            // Assign the result to a CustomerEntity.
-            UglyComment deleteEntity = (UglyComment)retrievedResult.Result;
-
-            // Create the Delete TableOperation.
-            if (deleteEntity != null)
-            {
-                TableOperation deleteOperation = TableOperation.Delete(deleteEntity);
-
-                // Execute the operation.
-                table.Execute(deleteOperation);
-
             }
         }
     }
