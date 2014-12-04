@@ -21,7 +21,7 @@ namespace FulaDjur.Data.Implementations
         private string qConnectionString = "Endpoint=sb://animalqueu-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=NpRLmVlZ5Gw3ChHCWBmBUYY06ZJNOTBpy2pYwoxxEso=";
         string qName = "animalqueu";
 
-        private string fuladjurstorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=fuladjurstorage;AccountKey=0qz/KnA6q9Pcnz8FYKFzpLuW9Qde5VwUDimZUDZ5wrpYBIgPkyDBPaAgv5SwYKQCOHDNVq/LYUsiQagi1KIFxA=="; 
+        private string fuladjurstorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=fuladjurstorage;AccountKey=0qz/KnA6q9Pcnz8FYKFzpLuW9Qde5VwUDimZUDZ5wrpYBIgPkyDBPaAgv5SwYKQCOHDNVq/LYUsiQagi1KIFxA==";
 
         public List<UglyAnimalModel> GetAll()
         {
@@ -83,7 +83,7 @@ namespace FulaDjur.Data.Implementations
             CloudTable table = tableClient.GetTableReference("UglyAnimals");
 
             // Create a retrieve operation that takes a customer entity.
-            TableOperation retrieveOperation = TableOperation.Retrieve<UglyAnimal>("BildId","UglyRating");
+            TableOperation retrieveOperation = TableOperation.Retrieve<UglyAnimal>("BildId", "UglyRating");
 
             // Execute the retrieve operation.
             TableResult retrievedResult = table.Execute(retrieveOperation);
@@ -91,13 +91,30 @@ namespace FulaDjur.Data.Implementations
             // Print the phone number of the result.
             if (retrievedResult.Result != null)
             {
-                Console.WriteLine(((UglyAnimalModel) retrievedResult.Result).UglyRating);
-                var Result = ((UglyAnimalModel) retrievedResult.Result).UglyRating;
+                Console.WriteLine(((UglyAnimalModel)retrievedResult.Result).UglyRating);
+                var Result = ((UglyAnimalModel)retrievedResult.Result).UglyRating;
                 return Result;
             }
             else
                 Console.WriteLine("Rating culd not be recivd");
             return 0;
+
+        }
+
+        public void Delete(string imgUri)
+        {
+            Uri uri = new Uri(imgUri);
+            string filename = System.IO.Path.GetFileName(uri.LocalPath);
+
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
+
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+
+            CloudBlobContainer container = blobClient.GetContainerReference("mycontainer");
+
+            CloudBlockBlob blob = container.GetBlockBlobReference(filename);
+
+            blob.Delete();
 
         }
 
@@ -119,7 +136,7 @@ namespace FulaDjur.Data.Implementations
             QueueClient qc = QueueClient.CreateFromConnectionString(qConnectionString, qName);
 
             var bm = new BrokeredMessage(file.InputStream, true);
-            
+
             bm.Properties["Action"] = "Create";
             bm.Properties["Topic"] = topic;
 
@@ -131,7 +148,7 @@ namespace FulaDjur.Data.Implementations
 
         public void UpdateRating(string BildId, int counter, int rating)
         {
-             // Retrieve storage account from connection string.
+            // Retrieve storage account from connection string.
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
 
             // Create the table client.
@@ -171,8 +188,8 @@ namespace FulaDjur.Data.Implementations
 
             else
                 Console.WriteLine("Entity could not be retrieved.");
-           
-            
+
+
 
             //var bm = new BrokeredMessage();
             //bm.Properties["Action"] = "UpdateRating";
