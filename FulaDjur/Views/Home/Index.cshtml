@@ -16,11 +16,11 @@
                 <div class="row">
                     <div class="plate center-block">
                         
-                        <h1>@Html.DisplayFor(modelItem => djur.Rubrik)</h1>
+                        <h1 class="text-center">@Html.DisplayFor(modelItem => djur.Rubrik)</h1>
                         <div class="bg-image bg-image-holder" style="background-image:url(@Url.Content(djur.ImageUrl));"></div>
-                        
+                        <h4 class="text-center">Grad av fulhet</h4>
                         @Html.HiddenFor(model => djur.Id)
-                        <input type="text" class="rating rating5 " value="@djur.UglyRating" /><p>Grad av fulhet</p>
+                        <input type="text" class="rating rating5 " value="@djur.UglyRating" />
                         @foreach (var comment in djur.UglyComments)
                         {
                             <div class="panel panel-info">

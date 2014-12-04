@@ -35,7 +35,7 @@ PostRating = function (v, bildid) {
             var e = $(this);
             var c = parseInt(e.attr("class").match(/rating\d+/)[0].replace('rating', ''));
 
-            var ul = $('<ul class="rating"></ul>').insertAfter(e).width(c * 20 + 'px');
+            var ul = $('<ul class="rating"></ul>').insertAfter(e).width(c * 40 + 'px');
 
             if (c > 0) {
                 for (k = 0; k < c; k++) {

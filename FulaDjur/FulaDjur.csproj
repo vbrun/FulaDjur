@@ -238,6 +238,7 @@
     <Content Include="Icons\stars.png" />
     <Content Include="Images\fuladjur_logo.png" />
     <Content Include="Images\rating.png" />
+    <Content Include="Images\stars.png" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\ImageUpload.js" />

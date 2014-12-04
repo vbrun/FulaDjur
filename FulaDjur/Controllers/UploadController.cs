@@ -49,7 +49,7 @@ namespace FulaDjur.Controllers
 
             else
             {
-                ViewBag.UploadMessage = String.Format("Got image {0} of type {1} and size {2}",
+                ViewBag.UploadMessage = String.Format("Bilden {0} av typ {1} och storlek {2} togs emot.",
                 image.FileName, image.ContentType, image.ContentLength);
 
                 _animals.Create(rubrik, image);
