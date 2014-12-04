@@ -11,6 +11,8 @@ namespace FulaDjur.Data
     public interface IAnimalRepository
     {
         List<UglyAnimalModel> GetAll();
+        float GetRating(string BildId);
         void Create(string topic, HttpPostedFileBase image);
+        void UpdateRating(string bildId, int counter, int rating);
     }
 }

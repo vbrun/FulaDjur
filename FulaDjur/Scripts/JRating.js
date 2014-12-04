@@ -39,7 +39,7 @@ PostRating = function (v, bildid) {
 
             if (c > 0) {
                 for (k = 0; k < c; k++) {
-                    ul.append('<li><a href="javascript:void(0);" title="' + (k + 1) + '">' + (k + 1) + '</a></li>')
+                    ul.append('<li><a href="javascript:void(0);" title="' + (k + 1) + '">' + (k + 1) + '</a></li>');
                 }
             }
 
@@ -68,8 +68,7 @@ PostRating = function (v, bildid) {
                         e.val(index + 1);
                         var v = parseInt(e.val());
                         PostRating(v, bildid);
-                        console.log(this);
-                        console.log(bildid);
+                    
                         setRating(e, ul);
 
                         settings.rateEnd(index +1);
