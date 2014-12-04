@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FulaDjur.Data.Implementations
 {
-    class FakeAnimalRepository : IAnimalRepository
+    class FakeUglyAnimalRepository : IAnimalRepository
     {
 
         public List<UglyAnimalModel> GetAll()
@@ -16,20 +16,20 @@ namespace FulaDjur.Data.Implementations
             {
                 new UglyAnimalModel
                 {
-                    Id = 1,
+                    Id = "1",
                     Rubrik = "Fulafisken",
                     ImageUrl = "https://24tanzania.com/wp-content/uploads/2013/09/adeaBlobfish.jpg",
                     UglyRating = 5
                 },
                 new UglyAnimalModel
                 {
-                    Id = 2,
+                    Id = "2",
                     Rubrik = "Bee happy!",
                     ImageUrl = "http://cdn1.smosh.com/sites/default/files/legacy.images/smosh-pit/122010/ugly-cat-9.jpg",
                     UglyRating = 2
                 },
                 new UglyAnimalModel {
-                    Id = 3,
+                    Id = "3",
                     Rubrik = "Uppklädd",
                     ImageUrl = "http://littlefun.org/uploads/524b6b7be691b20cf6c4428c_736.jpg",
                     UglyRating = 4
@@ -37,6 +37,12 @@ namespace FulaDjur.Data.Implementations
             };
 
             return fuladjur;
+        }
+
+
+        public void Create(string topic, System.Web.HttpPostedFileBase file)
+        {
+            throw new NotImplementedException();
         }
     }
 }

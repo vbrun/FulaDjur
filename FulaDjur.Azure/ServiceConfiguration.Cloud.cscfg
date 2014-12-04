@@ -18,4 +18,11 @@
     <Instances count="1" />
     <ConfigurationSettings />
   </Role>
+  <Role name="CommentWorker">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      <Setting name="animalqueu" value="Endpoint=sb://animalqueu-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=NpRLmVlZ5Gw3ChHCWBmBUYY06ZJNOTBpy2pYwoxxEso=" />
+      <Setting name="fuladjurstorage" value="DefaultEndpointsProtocol=https;AccountName=fuladjurstorage;AccountKey=0qz/KnA6q9Pcnz8FYKFzpLuW9Qde5VwUDimZUDZ5wrpYBIgPkyDBPaAgv5SwYKQCOHDNVq/LYUsiQagi1KIFxA==" />
+    </ConfigurationSettings>
+  </Role>
 </ServiceConfiguration>

@@ -197,14 +197,17 @@
     <Compile Include="Controllers\RatingController.cs" />
     <Compile Include="Controllers\UploadController.cs" />
     <Compile Include="Data\IAnimalRepository.cs" />
-    <Compile Include="Data\Implementations\FakeAnimalRepository.cs" />
+    <Compile Include="Data\Implementations\FakeUglyAnimalRepository.cs" />
     <Compile Include="Data\Implementations\FakeUglyCommentRepository.cs" />
+    <Compile Include="Data\Implementations\UglyAnimalRepository.cs" />
     <Compile Include="Data\Implementations\UglyCommentRepository.cs" />
     <Compile Include="Data\IUglyCommentRepository.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\UglyAnimal.cs" />
+    <Compile Include="Models\UglyComment.cs" />
     <Compile Include="Models\ViewModels\MainListViewModel.cs" />
     <Compile Include="Models\ViewModels\UglyAnimalModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -284,7 +287,7 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Upload\ImageUpload.cshtml" />
+    <Content Include="Views\Upload\Index.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\UglyCommentModel.cshtml" />
   </ItemGroup>
   <ItemGroup>

@@ -7,25 +7,52 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
+using AnimalWorker.Models;
 
 namespace FulaDjur.Data.Implementations
 {
     public class UglyCommentRepository : IUglyCommentRepository
     {
         string qConnectionString = CloudConfigurationManager.GetSetting("animalqueu");
-        string qName = "animalqueu";
+        string qName = "commentqueu";
 
-        public List<UglyCommentModel> GetAll(int id)
+        string fuladjurstorageConnectionString = CloudConfigurationManager.GetSetting("fuladjurstorage");
+
+        public List<UglyCommentModel> GetAll(string animalId)
         {
-            var allUglyComments = new List<UglyCommentModel>()
-            {
-                new UglyCommentModel { AnimalId = 1, Name = "Bjön", Text = "Va ful!!!"},
-                new UglyCommentModel { AnimalId = 1, Name = "Pontus", Text = "OMG!"},
-                new UglyCommentModel { AnimalId = 2, Name = "Vbrun", Text = "å fyfan"},
-                new UglyCommentModel { AnimalId = 3, Name = "Jim", Text = "Ser ut som Björn"}
-            };
+            // Retrieve storage account from connection string.
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
 
-            var uglyComments = allUglyComments.Where(comment => comment.AnimalId == id).ToList();
+            // Create the table client.
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+
+            // Create the CloudTable object that represents the "UglyAnimals" table.
+            CloudTable table = tableClient.GetTableReference("UglyComments");
+
+            TableQuery<UglyComment> query = new TableQuery<UglyComment>().Where(
+                TableQuery.CombineFilters(
+                    TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "UglyComment"),
+                    TableOperators.And,
+                    TableQuery.GenerateFilterCondition("AnimalId", QueryComparisons.Equal, animalId)));
+
+            List<UglyCommentModel> uglyComments = new List<UglyCommentModel>();
+
+            // Print the fields for each animal.
+            foreach (UglyComment entity in table.ExecuteQuery(query))
+            {
+   
+                var comment = new UglyCommentModel
+                {
+                    Id = entity.RowKey,
+                    Name = entity.Name,
+                    Text = entity.Text,
+                    AnimalId = entity.AnimalId
+                };
+
+                uglyComments.Add(comment);
+            }
 
             return uglyComments;
         }

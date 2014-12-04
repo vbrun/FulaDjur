@@ -10,6 +10,8 @@ using Microsoft.ServiceBus.Messaging;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
+using FulaDjur.Data;
+using FulaDjur.Data.Implementations;
 
 
 namespace FulaDjur.Controllers
@@ -19,19 +21,25 @@ namespace FulaDjur.Controllers
         string qConnectionString = CloudConfigurationManager.GetSetting("animalqueu");
         string qName = "animalqueu";
         string fuladjurstorageConnectionString = CloudConfigurationManager.GetSetting("fuladjurstorage");
-       // CloudStorageAccount _storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("jimstoragetest"));
+
+        IAnimalRepository _animals;
+        // CloudStorageAccount _storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("jimstoragetest"));
+
+        public UploadController()
+        {
+            _animals = new UglyAnimalRepository();
+        }
 
         // GET: Upload
         public ActionResult Index()
         {
-            return View("ImageUpload");
+            return View();
        
         }
         
         [HttpPost]
-        public ActionResult ImageUpload()
+        public ActionResult Index(string rubrik)
         {
-            string path = @"D:\Temp\";
 
             var image = Request.Files["image"];
             if (image == null)
@@ -44,8 +52,7 @@ namespace FulaDjur.Controllers
                 ViewBag.UploadMessage = String.Format("Got image {0} of type {1} and size {2}",
                 image.FileName, image.ContentType, image.ContentLength);
 
-                // TODO: actually save the image to Azure blob storage
-                UploadAnimal(image);
+                _animals.Create(rubrik, image);
 
             }
 
@@ -86,5 +93,6 @@ namespace FulaDjur.Controllers
 
             return View("Index");
         }
+
     }
 }

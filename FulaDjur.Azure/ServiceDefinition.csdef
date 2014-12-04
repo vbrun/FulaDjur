@@ -23,4 +23,10 @@
     </ConfigurationSettings>
   </WorkerRole>
   <WorkerRole name="ImageWorker" vmsize="Small" />
+  <WorkerRole name="CommentWorker" vmsize="Small">
+    <ConfigurationSettings>
+      <Setting name="animalqueu" />
+      <Setting name="fuladjurstorage" />
+    </ConfigurationSettings>
+  </WorkerRole>
 </ServiceDefinition>

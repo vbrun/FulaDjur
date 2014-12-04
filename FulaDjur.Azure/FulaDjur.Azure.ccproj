@@ -45,6 +45,14 @@
       <RoleName>AnimalWorker</RoleName>
       <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
     </ProjectReference>
+    <ProjectReference Include="..\CommentWorker\CommentWorker.csproj">
+      <Name>CommentWorker</Name>
+      <Project>{ea399fdb-b525-4372-8bd6-9e997e949e82}</Project>
+      <Private>True</Private>
+      <RoleType>Worker</RoleType>
+      <RoleName>CommentWorker</RoleName>
+      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+    </ProjectReference>
     <ProjectReference Include="..\FulaDjur\FulaDjur.csproj">
       <Name>FulaDjur</Name>
       <Project>{16da7508-f965-4b01-864f-1b169e5eef5c}</Project>
@@ -64,12 +72,14 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AnimalWorkerContent\" />
+    <Folder Include="CommentWorkerContent\" />
     <Folder Include="FulaDjurContent\" />
     <Folder Include="ImageWorkerContent\" />
     <Folder Include="Profiles" />
   </ItemGroup>
   <ItemGroup>
     <DiagnosticsConfiguration Include="AnimalWorkerContent\diagnostics.wadcfgx" />
+    <DiagnosticsConfiguration Include="CommentWorkerContent\diagnostics.wadcfgx" />
     <DiagnosticsConfiguration Include="FulaDjurContent\diagnostics.wadcfgx" />
     <DiagnosticsConfiguration Include="ImageWorkerContent\diagnostics.wadcfgx" />
   </ItemGroup>

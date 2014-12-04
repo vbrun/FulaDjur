@@ -9,7 +9,7 @@ namespace FulaDjur.Data
 {
     public interface IUglyCommentRepository
     {
-        List<UglyCommentModel> GetAll(int id);
+        List<UglyCommentModel> GetAll(string id);
         void Create(UglyCommentModel comment);
     }
 }

@@ -8,7 +8,7 @@ namespace FulaDjur.Models.ViewModels
 {
     public class UglyAnimalModel
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string Rubrik { get; set; }
         public string ImageUrl { get; set; }
         public float UglyRating { get; set; }

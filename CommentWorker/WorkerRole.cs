@@ -14,21 +14,21 @@ using Microsoft.ServiceBus.Messaging;
 using Microsoft.WindowsAzure.Storage.Table;
 using AnimalWorker.Models;
 
-namespace AnimalWorker
+namespace CommentWorker
 {
     public class WorkerRole : RoleEntryPoint
     {
         string qConnectionString = CloudConfigurationManager.GetSetting("animalqueu");
-        string qName = "animalqueu";
+        string qName = "commentqueu";
 
-        string fuladjurstorageConnectionString = CloudConfigurationManager.GetSetting("fuladjurstorage"); 
+        string fuladjurstorageConnectionString = CloudConfigurationManager.GetSetting("fuladjurstorage");
 
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private readonly ManualResetEvent runCompleteEvent = new ManualResetEvent(false);
 
         public override void Run()
         {
-            Trace.TraceInformation("AnimalWorker is running");
+            Trace.TraceInformation("CommentWorker is running");
 
             try
             {
@@ -50,21 +50,21 @@ namespace AnimalWorker
 
             bool result = base.OnStart();
 
-            Trace.TraceInformation("AnimalWorker has been started");
+            Trace.TraceInformation("CommentWorker has been started");
 
             return result;
         }
 
         public override void OnStop()
         {
-            Trace.TraceInformation("AnimalWorker is stopping");
+            Trace.TraceInformation("CommentWorker is stopping");
 
             this.cancellationTokenSource.Cancel();
             this.runCompleteEvent.WaitOne();
 
             base.OnStop();
 
-            Trace.TraceInformation("AnimalWorker has stopped");
+            Trace.TraceInformation("CommentWorker has stopped");
         }
 
         private async Task RunAsync(CancellationToken cancellationToken)
@@ -72,7 +72,7 @@ namespace AnimalWorker
             // TODO: Replace the following with your own logic.
             while (!cancellationToken.IsCancellationRequested)
             {
-                Trace.TraceInformation("Working like an animal");
+                Trace.TraceInformation("Waiting for comment");
 
                 //Skapa ny Queueclient 
                 QueueClient qc = QueueClient.CreateFromConnectionString(qConnectionString, qName);
@@ -82,87 +82,51 @@ namespace AnimalWorker
                 {
                     try
                     {
-                        Trace.WriteLine("Animal Received");
+                        Trace.WriteLine("Comment Received");
                         msg.Complete();
 
-                        var topic = (string)msg.Properties["Topic"];
-                        //var image = (string)msg.Properties["Image"];
+                        var name = (string)msg.Properties["Name"];
+                        var text = (string)msg.Properties["Text"];
+                        var animalid = (string)msg.Properties["AnimalId"];
 
-                        SaveAnimalToStorage(topic); 
-
-                        //Trace.WriteLine("Comment Received");
-                        //msg.Complete();
-
-                        //var name = (string)msg.Properties["Name"];
-                        //var text = (string)msg.Properties["Text"];
-                        //var animalid = (int)msg.Properties["AnimalId"];
-
-                        //SaveCommentToStorage(name, text, animalid);
+                        SaveCommentToStorage(name, text, animalid);
                     }
                     catch (Exception)
                     {
                         // Problem, lås upp message i queue 
                         msg.Abandon();
                     }
-                } 
+                }
 
                 await Task.Delay(1000);
             }
         }
 
-        private void SaveAnimalToStorage(string topic)
+        private void SaveCommentToStorage(string name, string text, string animalid)
         {
             //det namn vår table ska ha 
-            string tableName = "UglyAnimals";
+            string tableName = "UglyComments";
             //Connection till table storage account 
             CloudStorageAccount account = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
             //Klient för table storage 
             CloudTableClient tableStorage = account.CreateCloudTableClient();
-            //Hämta en reference till tablen, om inte finns, skapa table
+            //Hämta en reference till tablen, om inte finns, skapa table 
             CloudTable table = tableStorage.GetTableReference(tableName);
             table.CreateIfNotExists();
 
             var key = Guid.NewGuid().ToString();
 
-            var uglyAnimal = new UglyAnimal(key)
+            var comment = new UglyComment(key)
             {
-                Topic = topic,
-                ImageId = "bulle",
-                TotalPoints = 0,
-                NumberClicks = 0
+                Name = name,
+                Text = text,
+                AnimalId = animalid
             };
 
             //Sparar personen i signups table 
-            TableOperation insertOperation = TableOperation.Insert(uglyAnimal);
+            TableOperation insertOperation = TableOperation.Insert(comment);
             table.Execute(insertOperation);
-        }
 
-
-        //private void SaveCommentToStorage(string name, string text, int animalid)
-        //{
-        //    //det namn vår table ska ha 
-        //    string tableName = "UglyComments";
-        //    //Connection till table storage account 
-        //    CloudStorageAccount account = CloudStorageAccount.Parse(fuladjurstorageConnectionString);
-        //    //Klient för table storage 
-        //    CloudTableClient tableStorage = account.CreateCloudTableClient();
-        //    //Hämta en reference till tablen, om inte finns, skapa table 
-        //    CloudTable table = tableStorage.GetTableReference(tableName);
-        //    table.CreateIfNotExists();
-
-        //    var key = Guid.NewGuid().ToString();
-
-        //    var comment = new UglyComment(key)
-        //    {
-        //        Name = name,
-        //        Text = text,
-        //        AnimalId = animalid
-        //    };
-
-        //    //Sparar personen i signups table 
-        //    TableOperation insertOperation = TableOperation.Insert(comment);
-        //    table.Execute(insertOperation);
-
-        //} 
+        } 
     }
 }

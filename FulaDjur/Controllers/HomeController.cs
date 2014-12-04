@@ -18,7 +18,7 @@ namespace FulaDjur.Controllers
 
         public HomeController()
         {
-            _animals = new FakeAnimalRepository();
+            _animals = new UglyAnimalRepository();
             _uglyComments = new UglyCommentRepository();
         }
 
@@ -42,20 +42,10 @@ namespace FulaDjur.Controllers
         }
 
         [HttpPost]
-        public ActionResult Index(int Id, MainListViewModel model)
-        {
-            //var newCommentModel = model.Animals.FirstOrDefault(djur => djur.Id == Id).NewComment;
-
-            //_uglyComments.Create(newCommentModel);
-
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        public ActionResult CreateComment(UglyAnimalModel form)
+        public ActionResult CreateComment(FormCollection form)
         {
 
-            int animalId = int.Parse(Request.Form["djur.NewComment.AnimalId"]);
+            string animalId = Request.Form["djur.NewComment.AnimalId"];
             string name = Request.Form["djur.NewComment.Name"];
             string text = Request.Form["djur.NewComment.Text"];
 
