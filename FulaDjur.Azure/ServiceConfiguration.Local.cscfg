@@ -14,10 +14,6 @@
       <Setting name="animalqueu" value="Endpoint=sb://animalqueu-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=NpRLmVlZ5Gw3ChHCWBmBUYY06ZJNOTBpy2pYwoxxEso=" />
     </ConfigurationSettings>
   </Role>
-  <Role name="ImageWorker">
-    <Instances count="1" />
-    <ConfigurationSettings />
-  </Role>
   <Role name="CommentWorker">
     <Instances count="1" />
     <ConfigurationSettings>

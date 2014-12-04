@@ -61,14 +61,6 @@
       <RoleName>FulaDjur</RoleName>
       <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
     </ProjectReference>
-    <ProjectReference Include="..\ImageWorker\ImageWorker.csproj">
-      <Name>ImageWorker</Name>
-      <Project>{d468b6d5-3c28-4498-9fe6-74a8bcc0ed94}</Project>
-      <Private>True</Private>
-      <RoleType>Worker</RoleType>
-      <RoleName>ImageWorker</RoleName>
-      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AnimalWorkerContent\" />
