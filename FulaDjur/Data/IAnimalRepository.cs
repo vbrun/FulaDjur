@@ -13,7 +13,7 @@ namespace FulaDjur.Data
         List<UglyAnimalModel> GetAll();
         float GetRating(string BildId);
         void Create(string topic, HttpPostedFileBase image);
-        void UpdateRating(string bildId, int counter, int rating);
+        void UpdateRating(string bildId, int rating);
         void Delete(string imgUri);
     }
 }

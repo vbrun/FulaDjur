@@ -55,7 +55,7 @@ namespace FulaDjur.Data.Implementations
         }
 
 
-        public void UpdateRating(string bildId, int counter, int rating)
+        public void UpdateRating(string bildId, int rating)
         {
             throw new NotImplementedException();
         }

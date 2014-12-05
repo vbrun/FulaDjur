@@ -22,11 +22,10 @@ namespace FulaDjur.Controllers
         {
             var IdBild = bildId;
             _animals = new UglyAnimalRepository();
-            var counter = 0;
-            int i = counter++;
+
             var sum = + number;
 
-           _animals.UpdateRating(IdBild,i,sum); 
+           _animals.UpdateRating(IdBild,sum); 
           // var LoadRating = _animals.GetRating(bildId);
             
 

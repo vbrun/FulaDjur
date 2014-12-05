@@ -139,7 +139,7 @@ namespace FulaDjur.Data.Implementations
             qc.Send(bm);
         }
 
-        public void UpdateRating(string bildId, int counter, int rating)
+        public void UpdateRating(string bildId, int rating)
         {
 
             CreateQueueIfRequired();
@@ -151,7 +151,6 @@ namespace FulaDjur.Data.Implementations
             bm.Label = "UpdateRating";
 
             bm.Properties["BildId"] = bildId;
-            bm.Properties["Counter"] = counter;
             bm.Properties["Rating"] = rating;
 
             qc.Send(bm);
